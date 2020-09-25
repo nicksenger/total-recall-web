@@ -1,31 +1,19 @@
 use graphql_client::GraphQLQuery;
 
-type BigInt = i128;
+type BigInt = u128;
 
-#[derive(GraphQLQuery)]
-#[graphql(
-    schema_path = "src/operations/schema.json",
-    query_path = "src/operations/decks.graphql"
-)]
-pub struct LanguageList;
-
-#[derive(GraphQLQuery)]
-#[graphql(
-    schema_path = "src/operations/schema.json",
-    query_path = "src/operations/decks.graphql"
-)]
-pub struct UserDecks;
-
-#[derive(GraphQLQuery)]
-#[graphql(
-    schema_path = "src/operations/schema.json",
-    query_path = "src/operations/decks.graphql"
-)]
-pub struct CreateDeck;
-
-#[derive(GraphQLQuery)]
-#[graphql(
-    schema_path = "src/operations/schema.json",
-    query_path = "src/operations/decks.graphql"
-)]
-pub struct DeleteDeck;
+macro_rules! generate_query {
+    ($query:ident) => {
+        #[derive(GraphQLQuery)]
+        #[graphql(
+            schema_path = "src/operations/schema.json",
+            query_path = "src/operations/decks.graphql",
+            response_derives = "Debug"
+        )]
+        pub struct $query;
+    };
+}
+generate_query!(LanguageList);
+generate_query!(UserDecks);
+generate_query!(CreateDeck);
+generate_query!(DeleteDeck);

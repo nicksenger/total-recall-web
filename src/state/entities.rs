@@ -1,14 +1,16 @@
 use std::collections::HashMap;
 
+use graphql_client::{GraphQLQuery, Response as GQLResponse};
 use seed::prelude::Orders;
 
 use crate::messages::{
-    cards::CardsMsg,
+    cards::{CardsMsg, GetCardsSuccessPayload},
     decks::DecksMsg,
     session::{ScoreValue, SessionMsg},
     sets::SetsMsg,
-    Msg,
+    ErrorPayload, Msg,
 };
+use crate::operations::{cards, send_graphql_request};
 
 #[derive(Clone)]
 pub struct Set {
@@ -72,12 +74,84 @@ impl EntitiesModel {
     }
 }
 
-pub fn update(
-    action: &Msg,
-    model: &mut EntitiesModel,
-    orders: &mut impl Orders<Msg>,
-) {
-    match action {
+pub fn update(msg: &Msg, model: &mut EntitiesModel, orders: &mut impl Orders<Msg>) {
+    match msg {
+        Msg::Cards(CardsMsg::GetCards(payload)) => {
+            let deck_id = payload.deck_id;
+            orders.perform_cmd(async move {
+                Msg::Cards(CardsMsg::GetCardsFetched((
+                    deck_id,
+                    send_graphql_request(&cards::DeckCards::build_query(
+                        cards::deck_cards::Variables {
+                            deck_id: deck_id as i64,
+                        },
+                    ))
+                    .await,
+                )))
+            });
+        }
+
+        Msg::Cards(CardsMsg::GetCardsFetched((
+            deck_id,
+            Ok(GQLResponse {
+                data: Some(data),
+                errors: None,
+            }),
+        ))) => {
+            orders.send_msg(Msg::Cards(CardsMsg::GetCardsFailed(ErrorPayload {
+                content: "Failed to retrieve cards.".to_owned(),
+            })));
+            orders.send_msg(Msg::Cards(CardsMsg::GetCardsSuccess(
+                GetCardsSuccessPayload {
+                    deck_id: *deck_id,
+                    cards: (&data)
+                        .cards
+                        .iter()
+                        .map(|c| Card {
+                            id: c.id as usize,
+                            created: c.created_at,
+                            last_seen: c.scores.last().map(|s| s.created_at).unwrap_or(0),
+                            front: c.front.clone(),
+                            back: c.back.text.clone(),
+                            score: c
+                                .scores
+                                .iter()
+                                .map(|s| match s.value {
+                                    cards::deck_cards::ScoreValue::ZERO => "0".to_owned(),
+                                    cards::deck_cards::ScoreValue::ONE => "1".to_owned(),
+                                    cards::deck_cards::ScoreValue::TWO => "2".to_owned(),
+                                    cards::deck_cards::ScoreValue::THREE => "3".to_owned(),
+                                    cards::deck_cards::ScoreValue::FOUR => "4".to_owned(),
+                                    cards::deck_cards::ScoreValue::FIVE => "5".to_owned(),
+                                    _ => "0".to_owned(),
+                                })
+                                .collect::<Vec<String>>()
+                                .join(","),
+                            audio: c
+                                .back
+                                .audio
+                                .as_ref()
+                                .map(|s| s.to_owned())
+                                .unwrap_or("".to_owned()),
+                            image: c
+                                .back
+                                .image
+                                .as_ref()
+                                .map(|s| s.to_owned())
+                                .unwrap_or("".to_owned()),
+                            link: c.link.clone(),
+                        })
+                        .collect(),
+                },
+            )));
+        }
+
+        Msg::Cards(CardsMsg::GetCardsFetched(_)) => {
+            orders.send_msg(Msg::Cards(CardsMsg::GetCardsFailed(ErrorPayload {
+                content: "Failed to retrieve cards.".to_owned(),
+            })));
+        }
+
         Msg::Cards(CardsMsg::GetCardsSuccess(payload)) => {
             model.deck_cards.insert(
                 payload.deck_id,

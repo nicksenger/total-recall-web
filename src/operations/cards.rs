@@ -1,31 +1,19 @@
 use graphql_client::GraphQLQuery;
 
-type BigInt = i128;
+type BigInt = u128;
 
-#[derive(GraphQLQuery)]
-#[graphql(
-    schema_path = "src/operations/schema.json",
-    query_path = "src/operations/cards.graphql"
-)]
-pub struct DeckCards;
-
-#[derive(GraphQLQuery)]
-#[graphql(
-    schema_path = "src/operations/schema.json",
-    query_path = "src/operations/cards.graphql"
-)]
-pub struct CreateCard;
-
-#[derive(GraphQLQuery)]
-#[graphql(
-    schema_path = "src/operations/schema.json",
-    query_path = "src/operations/cards.graphql"
-)]
-pub struct DeleteCard;
-
-#[derive(GraphQLQuery)]
-#[graphql(
-    schema_path = "src/operations/schema.json",
-    query_path = "src/operations/cards.graphql"
-)]
-pub struct EditCardLink;
+macro_rules! generate_query {
+    ($query:ident) => {
+        #[derive(GraphQLQuery)]
+        #[graphql(
+            schema_path = "src/operations/schema.json",
+            query_path = "src/operations/cards.graphql",
+            response_derives = "Debug"
+        )]
+        pub struct $query;
+    };
+}
+generate_query!(DeckCards);
+generate_query!(CreateCard);
+generate_query!(DeleteCard);
+generate_query!(EditCardLink);

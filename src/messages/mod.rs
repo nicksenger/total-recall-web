@@ -6,7 +6,7 @@ pub mod session;
 pub mod sets;
 
 pub struct ErrorPayload {
-    content: String,
+    pub content: String,
 }
 
 pub enum Msg {

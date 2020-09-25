@@ -1,4 +1,8 @@
+use graphql_client::Response;
+use seed::prelude::fetch;
+
 use super::ErrorPayload;
+use crate::operations::cards;
 use crate::state::entities::Card;
 
 pub struct AddCardPayload {
@@ -62,6 +66,7 @@ pub enum CardsMsg {
     EditCardLinkFailed(ErrorPayload),
     EditCardLinkSuccess(EditCardLinkSuccessPayload),
     GetCards(GetCardsPayload),
+    GetCardsFetched((usize, fetch::Result<Response<cards::deck_cards::ResponseData>>)),
     GetCardsFailed(ErrorPayload),
     GetCardsSuccess(GetCardsSuccessPayload),
     ViewCardDetails(ViewCardDetailsPayload),
