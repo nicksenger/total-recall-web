@@ -1,11 +1,11 @@
 use seed::prelude::Orders;
 
-use crate::actions::{cards::CardsAction, GlobalAction};
+use crate::messages::{cards::CardsMsg, Msg};
 use crate::state::entities::Card;
 
 pub struct EditCardLinkScreenModel {
-    loading: bool,
-    selected_card: Option<Card>,
+    pub loading: bool,
+    pub selected_card: Option<Card>,
 }
 
 impl EditCardLinkScreenModel {
@@ -18,21 +18,21 @@ impl EditCardLinkScreenModel {
 }
 
 pub fn update(
-    action: &GlobalAction,
+    action: &Msg,
     model: &mut EditCardLinkScreenModel,
-    orders: &mut impl Orders<GlobalAction>,
+    orders: &mut impl Orders<Msg>,
 ) {
     match action {
-        GlobalAction::Cards(CardsAction::EditCardLink(_)) => {
+        Msg::Cards(CardsMsg::EditCardLink(_)) => {
             model.loading = true;
         }
 
-        GlobalAction::Cards(CardsAction::EditCardLinkSuccess(_))
-        | GlobalAction::Cards(CardsAction::EditCardLinkFailed(_)) => {
+        Msg::Cards(CardsMsg::EditCardLinkSuccess(_))
+        | Msg::Cards(CardsMsg::EditCardLinkFailed(_)) => {
             model.loading = false;
         }
 
-        GlobalAction::Cards(CardsAction::ViewEditCardLink(payload)) => {
+        Msg::Cards(CardsMsg::ViewEditCardLink(payload)) => {
             model.selected_card = Some(payload.card.clone());
         }
 

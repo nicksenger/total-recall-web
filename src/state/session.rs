@@ -4,9 +4,9 @@ use rand::prelude::*;
 use seed::prelude::Orders;
 
 use super::entities::Card;
-use crate::actions::{
-    session::{ScoreValue, SessionAction},
-    GlobalAction,
+use crate::messages::{
+    session::{ScoreValue, SessionMsg},
+    Msg,
 };
 use crate::utilities::super_memo::needs_review;
 
@@ -16,10 +16,10 @@ pub enum SessionStatus {
 }
 
 pub struct SessionModel {
-    loading: bool,
-    rate_queue: VecDeque<Card>,
-    review_queue: VecDeque<Card>,
-    status: SessionStatus,
+    pub loading: bool,
+    pub rate_queue: VecDeque<Card>,
+    pub review_queue: VecDeque<Card>,
+    pub status: SessionStatus,
 }
 
 impl SessionModel {
@@ -34,12 +34,12 @@ impl SessionModel {
 }
 
 pub fn update(
-    action: &GlobalAction,
+    action: &Msg,
     model: &mut SessionModel,
-    orders: &mut impl Orders<GlobalAction>,
+    orders: &mut impl Orders<Msg>,
 ) {
     match action {
-        GlobalAction::Session(SessionAction::Study(payload)) => {
+        Msg::Session(SessionMsg::Study(payload)) => {
             let mut cards: Vec<Card> = payload
                 .cards
                 .iter()
@@ -52,11 +52,11 @@ pub fn update(
             model.status = SessionStatus::Prompt;
         }
 
-        GlobalAction::Session(SessionAction::RateCard(_)) => {
+        Msg::Session(SessionMsg::RateCard(_)) => {
             model.loading = true;
         }
 
-        GlobalAction::Session(SessionAction::RateCardSuccess(payload)) => {
+        Msg::Session(SessionMsg::RateCardSuccess(payload)) => {
             model.loading = false;
             if let Some(card) = model.rate_queue.pop_front() {
                 match payload.rating {
@@ -73,15 +73,15 @@ pub fn update(
             model.rate_queue.pop_front();
         }
 
-        GlobalAction::Session(SessionAction::RateCardFailed(_)) => {
+        Msg::Session(SessionMsg::RateCardFailed(_)) => {
             model.loading = false;
         }
 
-        GlobalAction::Session(SessionAction::RevealCard(_)) => {
+        Msg::Session(SessionMsg::RevealCard(_)) => {
             model.status = SessionStatus::Score;
         }
 
-        GlobalAction::Session(SessionAction::ReviewCard(payload)) => {
+        Msg::Session(SessionMsg::ReviewCard(payload)) => {
             if let Some(card) = model.rate_queue.pop_front() {
                 match payload.rating {
                     ScoreValue::Four | ScoreValue::Five => {

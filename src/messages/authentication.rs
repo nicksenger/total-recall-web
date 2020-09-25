@@ -15,7 +15,7 @@ pub struct RegisterPayload {
     pub password: String,
 }
 
-pub enum AuthAction {
+pub enum AuthMsg {
     AttemptLogin(AttemptLoginPayload),
     LoginFailed(ErrorPayload),
     LoginSuccess(LoginSuccessPayload),

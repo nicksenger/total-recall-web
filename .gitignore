@@ -1,3 +1,4 @@
 /target
 /pkg
+/src/operations/schema.json
 Cargo.lock

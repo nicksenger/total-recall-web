@@ -1,10 +1,10 @@
 use seed::prelude::Orders;
 
-use crate::actions::{cards::CardsAction, GlobalAction};
+use crate::messages::{cards::CardsMsg, Msg};
 
 pub struct CardsScreenModel {
-    cards: Vec<usize>,
-    loading: bool,
+    pub cards: Vec<usize>,
+    pub loading: bool,
 }
 
 impl CardsScreenModel {
@@ -17,21 +17,21 @@ impl CardsScreenModel {
 }
 
 pub fn update(
-    action: &GlobalAction,
+    action: &Msg,
     model: &mut CardsScreenModel,
-    orders: &mut impl Orders<GlobalAction>,
+    orders: &mut impl Orders<Msg>,
 ) {
     match action {
-        GlobalAction::Cards(CardsAction::GetCards(_)) => {
+        Msg::Cards(CardsMsg::GetCards(_)) => {
             model.loading = true;
         }
 
-        GlobalAction::Cards(CardsAction::GetCardsSuccess(_))
-        | GlobalAction::Cards(CardsAction::GetCardsFailed(_)) => {
+        Msg::Cards(CardsMsg::GetCardsSuccess(_))
+        | Msg::Cards(CardsMsg::GetCardsFailed(_)) => {
             model.loading = false;
         }
 
-        GlobalAction::Cards(CardsAction::DeleteCardSuccess(payload)) => {
+        Msg::Cards(CardsMsg::DeleteCardSuccess(payload)) => {
             model.cards.retain(|&id| id != payload.card_id)
         }
 

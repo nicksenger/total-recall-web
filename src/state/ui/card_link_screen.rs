@@ -1,9 +1,9 @@
 use seed::prelude::Orders;
 
-use crate::actions::{cards::CardsAction, GlobalAction};
+use crate::messages::{cards::CardsMsg, Msg};
 
 pub struct CardLinkScreenModel {
-    link: String,
+    pub link: String,
 }
 
 impl CardLinkScreenModel {
@@ -15,12 +15,12 @@ impl CardLinkScreenModel {
 }
 
 pub fn update(
-    action: &GlobalAction,
+    action: &Msg,
     model: &mut CardLinkScreenModel,
-    orders: &mut impl Orders<GlobalAction>,
+    orders: &mut impl Orders<Msg>,
 ) {
     match action {
-        GlobalAction::Cards(CardsAction::ViewCardLink(payload)) => {
+        Msg::Cards(CardsMsg::ViewCardLink(payload)) => {
             model.link = payload.link.clone()
         }
 

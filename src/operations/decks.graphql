@@ -1,0 +1,33 @@
+query LanguageList {
+  Languages {
+    id
+    abbreviation
+    name
+  }
+}
+
+query UserDecks($username: String!) {
+  Decks(filter: { owner: { username: { eq: $username } } }) {
+    id
+    name
+    language {
+      name
+    }
+  }
+}
+
+mutation CreateDeck($name: String!, $language: Int!) {
+  CreateDeck(NewDeck: { name: $name, language: $language }) {
+    id
+    name
+    language {
+      name
+    }
+  }
+}
+
+mutation DeleteDeck($id: Int!) {
+  DeleteDeck(DeleteDeck: { id: $id }) {
+    count
+  }
+}

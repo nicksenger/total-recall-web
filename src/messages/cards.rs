@@ -51,7 +51,7 @@ pub struct ViewEditCardLinkPayload {
     pub card: Card,
 }
 
-pub enum CardsAction {
+pub enum CardsMsg {
     AddCard(AddCardPayload),
     AddCardFailed(ErrorPayload),
     AddCardSuccess(AddCardSuccessPayload),

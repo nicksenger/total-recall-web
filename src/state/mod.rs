@@ -1,6 +1,6 @@
 use seed::prelude::Orders;
 
-use super::actions::GlobalAction;
+use super::messages::Msg;
 
 pub mod authentication;
 pub mod cache;
@@ -9,11 +9,11 @@ pub mod session;
 pub mod ui;
 
 pub struct Model {
-    authentication: authentication::AuthenticationModel,
-    cache: cache::CacheModel,
-    entities: entities::EntitiesModel,
-    session: session::SessionModel,
-    ui: ui::UIModel,
+    pub authentication: authentication::AuthenticationModel,
+    pub cache: cache::CacheModel,
+    pub entities: entities::EntitiesModel,
+    pub session: session::SessionModel,
+    pub ui: ui::UIModel,
 }
 
 impl Model {
@@ -28,7 +28,7 @@ impl Model {
     }
 }
 
-pub fn update(action: GlobalAction, model: &mut Model, orders: &mut impl Orders<GlobalAction>) {
+pub fn update(action: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
     authentication::update(&action, &mut model.authentication, orders);
     cache::update(&action, &mut model.cache, orders);
     entities::update(&action, &mut model.entities, orders);

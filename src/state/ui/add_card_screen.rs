@@ -1,9 +1,9 @@
 use seed::prelude::Orders;
 
-use crate::actions::{cards::CardsAction, GlobalAction};
+use crate::messages::{cards::CardsMsg, Msg};
 
 pub struct AddCardScreenModel {
-    loading: bool,
+    pub loading: bool,
 }
 
 impl AddCardScreenModel {
@@ -13,17 +13,17 @@ impl AddCardScreenModel {
 }
 
 pub fn update(
-    action: &GlobalAction,
+    action: &Msg,
     model: &mut AddCardScreenModel,
-    orders: &mut impl Orders<GlobalAction>,
+    orders: &mut impl Orders<Msg>,
 ) {
     match action {
-        GlobalAction::Cards(CardsAction::AddCard(_)) => {
+        Msg::Cards(CardsMsg::AddCard(_)) => {
             model.loading = true;
         }
 
-        GlobalAction::Cards(CardsAction::AddCardSuccess(_))
-        | GlobalAction::Cards(CardsAction::AddCardFailed(_)) => {
+        Msg::Cards(CardsMsg::AddCardSuccess(_))
+        | Msg::Cards(CardsMsg::AddCardFailed(_)) => {
             model.loading = false;
         }
 

@@ -20,7 +20,7 @@ pub struct PlayAudioPayload {
     pub uri: String,
 }
 
-pub enum CacheAction {
+pub enum CacheMsg {
     AddToCache(AddToCachePayload),
     AddToCacheFailed(ErrorPayload),
     FetchImage(FetchImagePayload),

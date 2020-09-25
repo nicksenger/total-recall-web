@@ -1,0 +1,5 @@
+mutation RateCard($cardId: Int!, $rating: ScoreValue!) {
+  CreateScore(NewScore: { card: $cardId, value: $rating }) {
+    id
+  }
+}

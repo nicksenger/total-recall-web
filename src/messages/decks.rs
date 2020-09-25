@@ -40,7 +40,7 @@ pub struct ViewDeckItemsPayload {
     pub deck: Deck,
 }
 
-pub enum DecksAction {
+pub enum DecksMsg {
     AddDeck(AddDeckPayload),
     AddDeckFailed(ErrorPayload),
     AddDeckSuccess(AddDeckSuccessPayload),

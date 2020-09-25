@@ -1,11 +1,11 @@
 use seed::prelude::Orders;
 
-use crate::actions::{cards::CardsAction, GlobalAction};
+use crate::messages::{cards::CardsMsg, Msg};
 use crate::state::entities::Card;
 
 pub struct CardDetailsScreenModel {
-    loading: bool,
-    selected_card: Option<Card>,
+    pub loading: bool,
+    pub selected_card: Option<Card>,
 }
 
 impl CardDetailsScreenModel {
@@ -18,28 +18,28 @@ impl CardDetailsScreenModel {
 }
 
 pub fn update(
-    action: &GlobalAction,
+    action: &Msg,
     model: &mut CardDetailsScreenModel,
-    orders: &mut impl Orders<GlobalAction>,
+    orders: &mut impl Orders<Msg>,
 ) {
     match action {
-        GlobalAction::Cards(CardsAction::DeleteCard(_)) => {
+        Msg::Cards(CardsMsg::DeleteCard(_)) => {
             model.loading = true;
         }
 
-        GlobalAction::Cards(CardsAction::DeleteCardSuccess(_))
-        | GlobalAction::Cards(CardsAction::DeleteCardFailed(_)) => {
+        Msg::Cards(CardsMsg::DeleteCardSuccess(_))
+        | Msg::Cards(CardsMsg::DeleteCardFailed(_)) => {
             model.loading = false;
         }
 
-        GlobalAction::Cards(CardsAction::EditCardLinkSuccess(payload)) => {
+        Msg::Cards(CardsMsg::EditCardLinkSuccess(payload)) => {
             model
                 .selected_card
                 .as_mut()
                 .map(|c| c.link = Some(payload.link.clone()));
         }
 
-        GlobalAction::Cards(CardsAction::ViewCardDetails(payload)) => {
+        Msg::Cards(CardsMsg::ViewCardDetails(payload)) => {
             model.selected_card = Some(payload.card.clone());
         }
 

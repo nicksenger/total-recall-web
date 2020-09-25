@@ -1,9 +1,9 @@
 use seed::prelude::Orders;
 
-use crate::actions::{authentication::AuthAction, GlobalAction};
+use crate::messages::{authentication::AuthMsg, Msg};
 
 pub struct RegisterScreenModel {
-    loading: bool,
+    pub loading: bool,
 }
 
 impl RegisterScreenModel {
@@ -13,17 +13,17 @@ impl RegisterScreenModel {
 }
 
 pub fn update(
-    action: &GlobalAction,
+    action: &Msg,
     model: &mut RegisterScreenModel,
-    orders: &mut impl Orders<GlobalAction>,
+    orders: &mut impl Orders<Msg>,
 ) {
     match action {
-        GlobalAction::Authentication(AuthAction::Register(_)) => {
+        Msg::Authentication(AuthMsg::Register(_)) => {
             model.loading = true;
         }
 
-        GlobalAction::Authentication(AuthAction::RegistrationFailed(_))
-        | GlobalAction::Authentication(AuthAction::RegistrationSuccess) => {
+        Msg::Authentication(AuthMsg::RegistrationFailed(_))
+        | Msg::Authentication(AuthMsg::RegistrationSuccess) => {
             model.loading = false;
         }
 

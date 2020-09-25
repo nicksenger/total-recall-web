@@ -2,12 +2,12 @@ use std::collections::HashMap;
 
 use seed::prelude::Orders;
 
-use crate::actions::{
-    cards::CardsAction,
-    decks::DecksAction,
-    session::{ScoreValue, SessionAction},
-    sets::SetsAction,
-    GlobalAction,
+use crate::messages::{
+    cards::CardsMsg,
+    decks::DecksMsg,
+    session::{ScoreValue, SessionMsg},
+    sets::SetsMsg,
+    Msg,
 };
 
 #[derive(Clone)]
@@ -49,13 +49,13 @@ pub struct Language {
 }
 
 pub struct EntitiesModel {
-    cards: HashMap<usize, Card>,
-    deck_cards: HashMap<usize, Vec<usize>>,
-    deck_sets: HashMap<usize, Vec<usize>>,
-    decks: HashMap<usize, Deck>,
-    set_cards: HashMap<usize, Vec<usize>>,
-    sets: HashMap<usize, Set>,
-    languages: HashMap<usize, Language>,
+    pub cards: HashMap<usize, Card>,
+    pub deck_cards: HashMap<usize, Vec<usize>>,
+    pub deck_sets: HashMap<usize, Vec<usize>>,
+    pub decks: HashMap<usize, Deck>,
+    pub set_cards: HashMap<usize, Vec<usize>>,
+    pub sets: HashMap<usize, Set>,
+    pub languages: HashMap<usize, Language>,
 }
 
 impl EntitiesModel {
@@ -73,12 +73,12 @@ impl EntitiesModel {
 }
 
 pub fn update(
-    action: &GlobalAction,
+    action: &Msg,
     model: &mut EntitiesModel,
-    orders: &mut impl Orders<GlobalAction>,
+    orders: &mut impl Orders<Msg>,
 ) {
     match action {
-        GlobalAction::Cards(CardsAction::GetCardsSuccess(payload)) => {
+        Msg::Cards(CardsMsg::GetCardsSuccess(payload)) => {
             model.deck_cards.insert(
                 payload.deck_id,
                 payload.cards.iter().map(|c| c.id).collect(),
@@ -88,13 +88,13 @@ pub fn update(
             });
         }
 
-        GlobalAction::Decks(DecksAction::GetDecksSuccess(payload)) => {
+        Msg::Decks(DecksMsg::GetDecksSuccess(payload)) => {
             payload.decks.iter().cloned().for_each(|deck| {
                 model.decks.insert(deck.id, deck);
             });
         }
 
-        GlobalAction::Sets(SetsAction::GetSetsSuccess(payload)) => {
+        Msg::Sets(SetsMsg::GetSetsSuccess(payload)) => {
             model
                 .deck_sets
                 .insert(payload.deck_id, payload.sets.iter().map(|s| s.id).collect());
@@ -111,11 +111,11 @@ pub fn update(
             });
         }
 
-        GlobalAction::Decks(DecksAction::DeleteDeckSuccess(payload)) => {
+        Msg::Decks(DecksMsg::DeleteDeckSuccess(payload)) => {
             model.decks.remove(&payload.deck_id);
         }
 
-        GlobalAction::Cards(CardsAction::DeleteCardSuccess(payload)) => {
+        Msg::Cards(CardsMsg::DeleteCardSuccess(payload)) => {
             model.cards.remove(&payload.card_id);
             model.deck_cards.iter_mut().for_each(|(_, card_ids)| {
                 card_ids.retain(|id| *id != payload.card_id);
@@ -125,20 +125,20 @@ pub fn update(
             });
         }
 
-        GlobalAction::Sets(SetsAction::DeleteSetSuccess(payload)) => {
+        Msg::Sets(SetsMsg::DeleteSetSuccess(payload)) => {
             model.sets.remove(&payload.set_id);
             model.deck_sets.iter_mut().for_each(|(_, set_ids)| {
                 set_ids.retain(|id| *id != payload.set_id);
             });
         }
 
-        GlobalAction::Cards(CardsAction::EditCardLinkSuccess(payload)) => {
+        Msg::Cards(CardsMsg::EditCardLinkSuccess(payload)) => {
             if let Some(card) = model.cards.get_mut(&payload.card_id) {
                 card.link = Some(payload.link.clone());
             }
         }
 
-        GlobalAction::Session(SessionAction::RateCardSuccess(payload)) => {
+        Msg::Session(SessionMsg::RateCardSuccess(payload)) => {
             if let Some(card) = model.cards.get_mut(&payload.card_id) {
                 let mut new_score = card.score.split(",").collect::<Vec<&str>>();
                 new_score.push(match payload.rating {
@@ -153,7 +153,7 @@ pub fn update(
             }
         }
 
-        GlobalAction::Decks(DecksAction::GetLanguagesSuccess(payload)) => {
+        Msg::Decks(DecksMsg::GetLanguagesSuccess(payload)) => {
             payload.languages.iter().cloned().for_each(|l| {
                 model.languages.insert(l.id, l);
             });

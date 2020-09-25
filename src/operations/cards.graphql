@@ -1,0 +1,35 @@
+query DeckCards($deckId: Int!) {
+  Cards(filter: { deck: { id: { eq: $deckId } } }) {
+    id
+    created_at
+    front
+    back {
+      text
+      audio
+      image
+    }
+    scores {
+      value
+      created_at
+    }
+    link
+  }
+}
+
+mutation CreateCard($deckId: Int!, $front: String!, $back: String!, $link: String) {
+  CreateCard(NewCard: { deck: $deckId, front: $front, back: $back, link: $link }) {
+    id
+  }
+}
+
+mutation DeleteCard($cardId: Int!) {
+  DeleteCard(DeleteCard: { id: $cardId }) {
+    count
+  }
+}
+
+mutation EditCardLink($cardId: Int!, $link: String!) {
+  UpdateCard(UpdateCard: { id: $cardId, link: $link }) {
+    id
+  }
+}

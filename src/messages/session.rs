@@ -32,7 +32,7 @@ pub struct StudyPayload {
     pub cards: Vec<Card>,
 }
 
-pub enum SessionAction {
+pub enum SessionMsg {
     RateCard(RateCardPayload),
     RateCardFailed(ErrorPayload),
     RateCardSuccess(RateCardSuccessPayload),

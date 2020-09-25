@@ -2,10 +2,10 @@ use std::collections::HashMap;
 
 use seed::prelude::Orders;
 
-use crate::actions::{GlobalAction, cache::CacheAction};
+use crate::messages::{Msg, cache::CacheMsg};
 
 pub struct CacheModel {
-  cache: HashMap<String, String>,
+  pub cache: HashMap<String, String>,
 }
 
 impl CacheModel {
@@ -17,16 +17,16 @@ impl CacheModel {
 }
 
 pub fn update(
-  action: &GlobalAction,
+  action: &Msg,
   model: &mut CacheModel,
-  orders: &mut impl Orders<GlobalAction>,
+  orders: &mut impl Orders<Msg>,
 ) {
   match action {
-      GlobalAction::Cache(CacheAction::AddToCache(payload)) => {
+      Msg::Cache(CacheMsg::AddToCache(payload)) => {
           model.cache.insert(payload.uri.clone(), payload.path.clone());
       }
 
-      GlobalAction::Cache(CacheAction::HydrateCache(payload)) => {
+      Msg::Cache(CacheMsg::HydrateCache(payload)) => {
           model.cache = payload.cache.clone();
       }
 

@@ -1,9 +1,9 @@
 use seed::prelude::Orders;
 
-use crate::actions::{decks::DecksAction, GlobalAction};
+use crate::messages::{decks::DecksMsg, Msg};
 
 pub struct AddDeckScreenModel {
-  loading: bool,
+  pub loading: bool,
 }
 
 impl AddDeckScreenModel {
@@ -13,20 +13,20 @@ impl AddDeckScreenModel {
 }
 
 pub fn update(
-  action: &GlobalAction,
+  action: &Msg,
   model: &mut AddDeckScreenModel,
-  orders: &mut impl Orders<GlobalAction>,
+  orders: &mut impl Orders<Msg>,
 ) {
   match action {
-      GlobalAction::Decks(DecksAction::AddDeck(_))
-      | GlobalAction::Decks(DecksAction::GetLanguages) => {
+      Msg::Decks(DecksMsg::AddDeck(_))
+      | Msg::Decks(DecksMsg::GetLanguages) => {
           model.loading = true;
       }
 
-      GlobalAction::Decks(DecksAction::AddDeckFailed(_))
-      | GlobalAction::Decks(DecksAction::AddDeckSuccess(_))
-      | GlobalAction::Decks(DecksAction::GetLanguagesFailed(_))
-      | GlobalAction::Decks(DecksAction::GetLanguagesSuccess(_)) => {
+      Msg::Decks(DecksMsg::AddDeckFailed(_))
+      | Msg::Decks(DecksMsg::AddDeckSuccess(_))
+      | Msg::Decks(DecksMsg::GetLanguagesFailed(_))
+      | Msg::Decks(DecksMsg::GetLanguagesSuccess(_)) => {
           model.loading = false;
       }
 

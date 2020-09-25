@@ -1,11 +1,11 @@
 use seed::prelude::Orders;
 
-use crate::actions::{decks::DecksAction, GlobalAction};
+use crate::messages::{decks::DecksMsg, Msg};
 use crate::state::entities::Deck;
 
 pub struct DeckDetailsScreenModel {
-    loading: bool,
-    selected_deck: Option<Deck>,
+    pub loading: bool,
+    pub selected_deck: Option<Deck>,
 }
 
 impl DeckDetailsScreenModel {
@@ -18,25 +18,25 @@ impl DeckDetailsScreenModel {
 }
 
 pub fn update(
-    action: &GlobalAction,
+    action: &Msg,
     model: &mut DeckDetailsScreenModel,
-    orders: &mut impl Orders<GlobalAction>,
+    orders: &mut impl Orders<Msg>,
 ) {
     match action {
-        GlobalAction::Decks(DecksAction::DeleteDeck(_)) => {
+        Msg::Decks(DecksMsg::DeleteDeck(_)) => {
             model.loading = true;
         }
 
-        GlobalAction::Decks(DecksAction::DeleteDeckSuccess(_))
-        | GlobalAction::Decks(DecksAction::DeleteDeckFailed(_)) => {
+        Msg::Decks(DecksMsg::DeleteDeckSuccess(_))
+        | Msg::Decks(DecksMsg::DeleteDeckFailed(_)) => {
             model.loading = false;
         }
 
-        GlobalAction::Decks(DecksAction::ViewDeckDetails(payload)) => {
+        Msg::Decks(DecksMsg::ViewDeckDetails(payload)) => {
             model.selected_deck = Some(payload.deck.clone());
         }
 
-        GlobalAction::Decks(DecksAction::ViewDeckItems(payload)) => {
+        Msg::Decks(DecksMsg::ViewDeckItems(payload)) => {
             model.selected_deck = Some(payload.deck.clone());
         }
 

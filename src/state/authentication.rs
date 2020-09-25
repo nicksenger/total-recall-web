@@ -1,11 +1,11 @@
 use seed::prelude::Orders;
 
-use crate::actions::{authentication::AuthAction, cache::CacheAction, GlobalAction};
+use crate::messages::{authentication::AuthMsg, cache::CacheMsg, Msg};
 
 pub struct AuthenticationModel {
-    loading: bool,
-    username: Option<String>,
-    token: Option<String>,
+    pub loading: bool,
+    pub username: Option<String>,
+    pub token: Option<String>,
 }
 
 impl AuthenticationModel {
@@ -19,28 +19,28 @@ impl AuthenticationModel {
 }
 
 pub fn update(
-    action: &GlobalAction,
+    action: &Msg,
     model: &mut AuthenticationModel,
-    orders: &mut impl Orders<GlobalAction>,
+    orders: &mut impl Orders<Msg>,
 ) {
     match action {
-        GlobalAction::Authentication(AuthAction::AttemptLogin(_)) => {
+        Msg::Authentication(AuthMsg::AttemptLogin(_)) => {
             model.loading = true;
         }
 
-        GlobalAction::Authentication(AuthAction::LoginFailed(_)) => {
+        Msg::Authentication(AuthMsg::LoginFailed(_)) => {
             model.loading = false;
             model.token = None;
             model.username = None;
         }
 
-        GlobalAction::Authentication(AuthAction::LoginSuccess(payload)) => {
+        Msg::Authentication(AuthMsg::LoginSuccess(payload)) => {
             model.loading = false;
             model.token = Some(payload.token.clone());
             model.username = Some(payload.username.clone());
         }
 
-        GlobalAction::Cache(CacheAction::HydrateCache(payload)) => {
+        Msg::Cache(CacheMsg::HydrateCache(payload)) => {
             if let Some((token, username)) = &payload.auth {
                 model.username = Some(username.clone());
                 model.token = Some(token.clone());

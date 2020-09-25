@@ -1,6 +1,6 @@
 use seed::prelude::Orders;
 
-use crate::actions::GlobalAction;
+use crate::messages::Msg;
 
 mod add_card_screen;
 mod add_deck_screen;
@@ -16,18 +16,18 @@ mod set_details_screen;
 mod sets_screen;
 
 pub struct UIModel {
-    add_card_screen: add_card_screen::AddCardScreenModel,
-    add_deck_screen: add_deck_screen::AddDeckScreenModel,
-    add_set_screen: add_set_screen::AddSetScreenModel,
-    card_details_screen: card_details_screen::CardDetailsScreenModel,
-    card_link_screen: card_link_screen::CardLinkScreenModel,
-    cards_screen: cards_screen::CardsScreenModel,
-    deck_details_screen: deck_details_screen::DeckDetailsScreenModel,
-    decks_screen: decks_screen::DecksScreenModel,
-    edit_card_link_screen: edit_card_link_screen::EditCardLinkScreenModel,
-    register_screen: register_screen::RegisterScreenModel,
-    sets_screen: sets_screen::SetsScreenModel,
-    set_details_screen: set_details_screen::SetDetailsScreenModel,
+    pub add_card_screen: add_card_screen::AddCardScreenModel,
+    pub add_deck_screen: add_deck_screen::AddDeckScreenModel,
+    pub add_set_screen: add_set_screen::AddSetScreenModel,
+    pub card_details_screen: card_details_screen::CardDetailsScreenModel,
+    pub card_link_screen: card_link_screen::CardLinkScreenModel,
+    pub cards_screen: cards_screen::CardsScreenModel,
+    pub deck_details_screen: deck_details_screen::DeckDetailsScreenModel,
+    pub decks_screen: decks_screen::DecksScreenModel,
+    pub edit_card_link_screen: edit_card_link_screen::EditCardLinkScreenModel,
+    pub register_screen: register_screen::RegisterScreenModel,
+    pub sets_screen: sets_screen::SetsScreenModel,
+    pub set_details_screen: set_details_screen::SetDetailsScreenModel,
 }
 
 impl UIModel {
@@ -49,7 +49,7 @@ impl UIModel {
     }
   }
 
-pub fn update(action: &GlobalAction, model: &mut UIModel, orders: &mut impl Orders<GlobalAction>) {
+pub fn update(action: &Msg, model: &mut UIModel, orders: &mut impl Orders<Msg>) {
     add_card_screen::update(action, &mut model.add_card_screen, orders);
     add_deck_screen::update(action, &mut model.add_deck_screen, orders);
     add_set_screen::update(action, &mut model.add_set_screen, orders);

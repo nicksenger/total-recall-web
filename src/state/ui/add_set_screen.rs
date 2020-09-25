@@ -1,11 +1,11 @@
 use seed::prelude::Orders;
 
-use crate::actions::{sets::SetsAction, GlobalAction};
+use crate::messages::{sets::SetsMsg, Msg};
 use crate::state::entities::Card;
 
 pub struct AddSetScreenModel {
-    cards: Vec<Card>,
-    loading: bool,
+    pub cards: Vec<Card>,
+    pub loading: bool,
 }
 
 impl AddSetScreenModel {
@@ -18,21 +18,21 @@ impl AddSetScreenModel {
 }
 
 pub fn update(
-    action: &GlobalAction,
+    action: &Msg,
     model: &mut AddSetScreenModel,
-    orders: &mut impl Orders<GlobalAction>,
+    orders: &mut impl Orders<Msg>,
 ) {
     match action {
-        GlobalAction::Sets(SetsAction::AddSet(_)) => {
+        Msg::Sets(SetsMsg::AddSet(_)) => {
             model.loading = true;
         }
 
-        GlobalAction::Sets(SetsAction::AddSetSuccess(_))
-        | GlobalAction::Sets(SetsAction::AddSetFailed(_)) => {
+        Msg::Sets(SetsMsg::AddSetSuccess(_))
+        | Msg::Sets(SetsMsg::AddSetFailed(_)) => {
             model.loading = false;
         }
 
-        GlobalAction::Sets(SetsAction::GotoAddSet(payload)) => {
+        Msg::Sets(SetsMsg::GotoAddSet(payload)) => {
             model.cards = payload.cards.clone();
         }
 

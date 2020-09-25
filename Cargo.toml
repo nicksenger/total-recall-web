@@ -16,10 +16,10 @@ crate-type = ["cdylib"]
 wasm-bindgen-test = "0.3.13"
 
 [dependencies]
-# This commit points to Seed 0.7.0 with important fixes.
-# Replace with `seed = "0.8.0"` (or newer) once released.
-seed = { git = "https://github.com/seed-rs/seed", rev = "0a538f0" }
+graphql_client = "^0.9"
 rand = "^0.7"
+seed = { git = "https://github.com/seed-rs/seed", rev = "0a538f0" }
+serde = "^1.0"
 
 [profile.release]
 lto = true

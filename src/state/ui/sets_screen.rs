@@ -1,10 +1,10 @@
 use seed::prelude::Orders;
 
-use crate::actions::{sets::SetsAction, GlobalAction};
+use crate::messages::{sets::SetsMsg, Msg};
 
 pub struct SetsScreenModel {
-    loading: bool,
-    sets: Vec<usize>,
+    pub loading: bool,
+    pub sets: Vec<usize>,
 }
 
 impl SetsScreenModel {
@@ -17,25 +17,25 @@ impl SetsScreenModel {
 }
 
 pub fn update(
-    action: &GlobalAction,
+    action: &Msg,
     model: &mut SetsScreenModel,
-    orders: &mut impl Orders<GlobalAction>,
+    orders: &mut impl Orders<Msg>,
 ) {
     match action {
-        GlobalAction::Sets(SetsAction::GetSets(_)) => {
+        Msg::Sets(SetsMsg::GetSets(_)) => {
             model.loading = true;
         }
 
-        GlobalAction::Sets(SetsAction::GetSetsFailed(_)) => {
+        Msg::Sets(SetsMsg::GetSetsFailed(_)) => {
             model.loading = false;
         }
 
-        GlobalAction::Sets(SetsAction::GetSetsSuccess(payload)) => {
+        Msg::Sets(SetsMsg::GetSetsSuccess(payload)) => {
             model.loading = false;
             model.sets = payload.sets.iter().map(|s| s.id).collect();
         }
 
-        GlobalAction::Sets(SetsAction::DeleteSetSuccess(payload)) => {
+        Msg::Sets(SetsMsg::DeleteSetSuccess(payload)) => {
             model.sets.retain(|&id| id != payload.set_id);
         }
 

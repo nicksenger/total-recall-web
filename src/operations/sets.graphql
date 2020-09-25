@@ -1,0 +1,26 @@
+query UserSets($deckId: Int!) {
+  Sets(filter: { deck: { id: { eq: $deckId } } }) {
+    id
+    name
+    owner {
+      username
+    }
+    cards {
+      card_id {
+        id
+      }
+    }
+  }
+}
+
+mutation CreateSet($deckId: Int!, $name: String!, $card_ids: [Int!]!) {
+  CreateSet(NewSet: { deck: $deckId, name: $name, cards: $card_ids }) {
+    id
+  }
+}
+
+mutation DeleteSet($setId: Int!) {
+  DeleteSet(DeleteSet: { id: $setId }) {
+    count
+  }
+}

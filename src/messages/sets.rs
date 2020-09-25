@@ -36,7 +36,7 @@ pub struct ViewSetDetailsPayload {
     pub set: Set,
 }
 
-pub enum SetsAction {
+pub enum SetsMsg {
     AddSet(AddSetPayload),
     AddSetFailed(ErrorPayload),
     AddSetSuccess(AddSetSuccessPayload),

@@ -1,10 +1,10 @@
 use seed::prelude::Orders;
 
-use crate::actions::{decks::DecksAction, GlobalAction};
+use crate::messages::{decks::DecksMsg, Msg};
 
 pub struct DecksScreenModel {
-    decks: Vec<usize>,
-    loading: bool,
+    pub decks: Vec<usize>,
+    pub loading: bool,
 }
 
 impl DecksScreenModel {
@@ -17,25 +17,25 @@ impl DecksScreenModel {
 }
 
 pub fn update(
-    action: &GlobalAction,
+    action: &Msg,
     model: &mut DecksScreenModel,
-    orders: &mut impl Orders<GlobalAction>,
+    orders: &mut impl Orders<Msg>,
 ) {
     match action {
-        GlobalAction::Decks(DecksAction::GetDecks(_)) => {
+        Msg::Decks(DecksMsg::GetDecks(_)) => {
             model.loading = true;
         }
 
-        GlobalAction::Decks(DecksAction::GetDecksSuccess(payload)) => {
+        Msg::Decks(DecksMsg::GetDecksSuccess(payload)) => {
             model.loading = false;
             model.decks = payload.decks.iter().map(|d| d.id).collect();
         }
 
-        GlobalAction::Decks(DecksAction::GetDecksFailed(_)) => {
+        Msg::Decks(DecksMsg::GetDecksFailed(_)) => {
             model.loading = false;
         }
 
-        GlobalAction::Decks(DecksAction::DeleteDeckSuccess(payload)) => {
+        Msg::Decks(DecksMsg::DeleteDeckSuccess(payload)) => {
             model.decks.retain(|&id| id != payload.deck_id);
         }
 
