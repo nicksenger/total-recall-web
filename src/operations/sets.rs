@@ -4,7 +4,7 @@ use seed::prelude::Orders;
 use super::send_graphql_request;
 use crate::{
     messages::{
-        sets::{DeleteSetSuccessPayload, GetSetsSuccessPayload, SetsMsg},
+        sets::{AddSetSuccessPayload, DeleteSetSuccessPayload, GetSetsSuccessPayload, SetsMsg},
         ErrorPayload, Msg,
     },
     state::{entities::Set, Model},
@@ -30,6 +30,45 @@ generate_query!(DeleteSet);
 
 pub fn operate(msg: &Msg, _model: &Model, orders: &mut impl Orders<Msg>) {
     match msg {
+        Msg::Sets(SetsMsg::AddSet(payload)) => {
+            let deck_id = payload.deck_id;
+            let card_ids = payload
+                .card_ids
+                .iter()
+                .map(|id| *id as i64)
+                .collect::<Vec<i64>>();
+            let name = payload.name.to_owned();
+            orders.perform_cmd(async move {
+                Msg::Sets(SetsMsg::AddSetFetched(
+                    deck_id,
+                    send_graphql_request(&CreateSet::build_query(create_set::Variables {
+                        deck_id: deck_id as i64,
+                        card_ids,
+                        name,
+                    }))
+                    .await,
+                ))
+            });
+        }
+
+        Msg::Sets(SetsMsg::AddSetFetched(
+            deck_id,
+            Ok(GQLResponse {
+                data: Some(_),
+                errors: None,
+            }),
+        )) => {
+            orders.send_msg(Msg::Sets(SetsMsg::AddSetSuccess(AddSetSuccessPayload {
+                deck_id: *deck_id,
+            })));
+        }
+
+        Msg::Sets(SetsMsg::AddSetFetched(_, x)) => {
+            orders.send_msg(Msg::Sets(SetsMsg::AddSetFailed(ErrorPayload {
+                content: get_gql_error_message(x, "Failed to create set."),
+            })));
+        }
+
         Msg::Sets(SetsMsg::GetSets(payload)) => {
             let deck_id = payload.deck_id;
             orders.perform_cmd(async move {

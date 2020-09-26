@@ -42,6 +42,10 @@ pub struct ViewSetDetailsPayload {
 
 pub enum SetsMsg {
     AddSet(AddSetPayload),
+    AddSetFetched(
+        usize,
+        fetch::Result<Response<sets::create_set::ResponseData>>,
+    ),
     AddSetFailed(ErrorPayload),
     AddSetSuccess(AddSetSuccessPayload),
     DeleteSet(DeleteSetPayload),

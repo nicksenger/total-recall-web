@@ -57,6 +57,10 @@ pub struct ViewEditCardLinkPayload {
 
 pub enum CardsMsg {
     AddCard(AddCardPayload),
+    AddCardFetched(
+        usize,
+        fetch::Result<Response<cards::create_card::ResponseData>>,
+    ),
     AddCardFailed(ErrorPayload),
     AddCardSuccess(AddCardSuccessPayload),
     DeleteCard(DeleteCardPayload),
@@ -67,6 +71,11 @@ pub enum CardsMsg {
     DeleteCardFailed(ErrorPayload),
     DeleteCardSuccess(DeleteCardSuccessPayload),
     EditCardLink(EditCardLinkPayload),
+    EditCardLinkFetched(
+        usize,
+        String,
+        fetch::Result<Response<cards::edit_card_link::ResponseData>>,
+    ),
     EditCardLinkFailed(ErrorPayload),
     EditCardLinkSuccess(EditCardLinkSuccessPayload),
     GetCards(GetCardsPayload),

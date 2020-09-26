@@ -46,6 +46,10 @@ pub struct ViewDeckItemsPayload {
 
 pub enum DecksMsg {
     AddDeck(AddDeckPayload),
+    AddDeckFetched(
+        String,
+        fetch::Result<Response<decks::create_deck::ResponseData>>,
+    ),
     AddDeckFailed(ErrorPayload),
     AddDeckSuccess(AddDeckSuccessPayload),
     DeleteDeck(DeleteDeckPayload),

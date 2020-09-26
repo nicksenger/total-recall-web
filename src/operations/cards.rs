@@ -4,7 +4,10 @@ use seed::prelude::Orders;
 use super::send_graphql_request;
 use crate::{
     messages::{
-        cards::{CardsMsg, DeleteCardSuccessPayload, GetCardsSuccessPayload},
+        cards::{
+            AddCardSuccessPayload, CardsMsg, DeleteCardSuccessPayload, EditCardLinkSuccessPayload,
+            GetCardsSuccessPayload,
+        },
         session::ScoreValue,
         ErrorPayload, Msg,
     },
@@ -32,6 +35,43 @@ generate_query!(EditCardLink);
 
 pub fn operate(msg: &Msg, _model: &Model, orders: &mut impl Orders<Msg>) {
     match msg {
+        Msg::Cards(CardsMsg::AddCard(payload)) => {
+            let deck_id = payload.deck_id;
+            let back = payload.back.clone();
+            let front = payload.back.clone();
+            let link = payload.link.clone();
+            orders.perform_cmd(async move {
+                Msg::Cards(CardsMsg::AddCardFetched(
+                    deck_id,
+                    send_graphql_request(&CreateCard::build_query(create_card::Variables {
+                        deck_id: deck_id as i64,
+                        back,
+                        front,
+                        link,
+                    }))
+                    .await,
+                ))
+            });
+        }
+
+        Msg::Cards(CardsMsg::AddCardFetched(
+            deck_id,
+            Ok(GQLResponse {
+                data: Some(_),
+                errors: None,
+            }),
+        )) => {
+            orders.send_msg(Msg::Cards(CardsMsg::AddCardSuccess(
+                AddCardSuccessPayload { deck_id: *deck_id },
+            )));
+        }
+
+        Msg::Cards(CardsMsg::AddCardFetched(_, x)) => {
+            orders.send_msg(Msg::Cards(CardsMsg::AddCardFailed(ErrorPayload {
+                content: get_gql_error_message(x, "Failed to add card."),
+            })));
+        }
+
         Msg::Cards(CardsMsg::GetCards(payload)) => {
             let deck_id = payload.deck_id;
             orders.perform_cmd(async move {
@@ -99,6 +139,44 @@ pub fn operate(msg: &Msg, _model: &Model, orders: &mut impl Orders<Msg>) {
         Msg::Cards(CardsMsg::GetCardsFetched(_, x)) => {
             orders.send_msg(Msg::Cards(CardsMsg::GetCardsFailed(ErrorPayload {
                 content: get_gql_error_message(x, "Failed to retrieve cards."),
+            })));
+        }
+
+        Msg::Cards(CardsMsg::EditCardLink(payload)) => {
+            let card_id = payload.card_id;
+            let link = payload.link.clone();
+            orders.perform_cmd(async move {
+                Msg::Cards(CardsMsg::EditCardLinkFetched(
+                    card_id,
+                    link.clone(),
+                    send_graphql_request(&EditCardLink::build_query(edit_card_link::Variables {
+                        card_id: card_id as i64,
+                        link,
+                    }))
+                    .await,
+                ))
+            });
+        }
+
+        Msg::Cards(CardsMsg::EditCardLinkFetched(
+            card_id,
+            link,
+            Ok(GQLResponse {
+                data: Some(_),
+                errors: None,
+            }),
+        )) => {
+            orders.send_msg(Msg::Cards(CardsMsg::EditCardLinkSuccess(
+                EditCardLinkSuccessPayload {
+                    card_id: *card_id,
+                    link: link.to_owned(),
+                },
+            )));
+        }
+
+        Msg::Cards(CardsMsg::EditCardLinkFetched(_, _, x)) => {
+            orders.send_msg(Msg::Cards(CardsMsg::EditCardLinkFailed(ErrorPayload {
+                content: get_gql_error_message(x, "Failed to edit card link."),
             })));
         }
 

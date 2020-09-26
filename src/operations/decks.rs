@@ -5,7 +5,8 @@ use super::send_graphql_request;
 use crate::{
     messages::{
         decks::{
-            DecksMsg, DeleteDeckSuccessPayload, GetDecksSuccessPayload, GetLanguagesSuccessPayload,
+            AddDeckSuccessPayload, DecksMsg, DeleteDeckSuccessPayload, GetDecksSuccessPayload,
+            GetLanguagesSuccessPayload,
         },
         ErrorPayload, Msg,
     },
@@ -36,6 +37,53 @@ generate_query!(DeleteDeck);
 
 pub fn operate(msg: &Msg, _model: &Model, orders: &mut impl Orders<Msg>) {
     match msg {
+        Msg::Decks(DecksMsg::AddDeck(payload)) => {
+            let username = payload.username.clone();
+            let name = payload.name.clone();
+            let language = payload.language as i64;
+            orders.perform_cmd(async move {
+                Msg::Decks(DecksMsg::AddDeckFetched(
+                    username,
+                    send_graphql_request(&CreateDeck::build_query(create_deck::Variables {
+                        name,
+                        language,
+                    }))
+                    .await,
+                ))
+            });
+        }
+
+        Msg::Decks(DecksMsg::AddDeckFetched(
+            username,
+            Ok(GQLResponse {
+                data: Some(data),
+                errors: None,
+            }),
+        )) => {
+            orders.send_msg(Msg::Decks(DecksMsg::AddDeckSuccess(
+                AddDeckSuccessPayload {
+                    username: username.to_owned(),
+                    deck: data
+                        .create_deck
+                        .as_ref()
+                        .map(|cd| Deck {
+                            id: cd.id as usize,
+                            created: 0,
+                            name: cd.name.to_owned(),
+                            language: cd.language.name.to_owned(),
+                            owner: username.to_owned(),
+                        })
+                        .unwrap(),
+                },
+            )));
+        }
+
+        Msg::Decks(DecksMsg::AddDeckFetched(_, x)) => {
+            orders.send_msg(Msg::Decks(DecksMsg::AddDeckFailed(ErrorPayload {
+                content: get_gql_error_message(x, "Failed to create deck."),
+            })));
+        }
+
         Msg::Decks(DecksMsg::GetDecks(payload)) => {
             let username = payload.username.clone();
             orders.perform_cmd(async move {
