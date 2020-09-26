@@ -1,7 +1,6 @@
 use std::collections::VecDeque;
 
 use rand::prelude::*;
-use seed::prelude::Orders;
 
 use super::entities::Card;
 use crate::messages::{
@@ -33,7 +32,7 @@ impl SessionModel {
     }
 }
 
-pub fn update(action: &Msg, model: &mut SessionModel, orders: &mut impl Orders<Msg>) {
+pub fn update(action: &Msg, model: &mut SessionModel) {
     match action {
         Msg::Session(SessionMsg::Study(payload)) => {
             let mut cards: Vec<Card> = payload

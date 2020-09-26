@@ -1,5 +1,3 @@
-use seed::prelude::Orders;
-
 use crate::messages::{cards::CardsMsg, Msg};
 use crate::state::entities::Card;
 
@@ -20,7 +18,6 @@ impl CardDetailsScreenModel {
 pub fn update(
     action: &Msg,
     model: &mut CardDetailsScreenModel,
-    orders: &mut impl Orders<Msg>,
 ) {
     match action {
         Msg::Cards(CardsMsg::DeleteCard(_)) => {

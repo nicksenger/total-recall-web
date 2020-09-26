@@ -1,7 +1,5 @@
 use std::collections::HashMap;
 
-use seed::prelude::Orders;
-
 use crate::messages::{Msg, cache::CacheMsg};
 
 pub struct CacheModel {
@@ -19,7 +17,6 @@ impl CacheModel {
 pub fn update(
   action: &Msg,
   model: &mut CacheModel,
-  orders: &mut impl Orders<Msg>,
 ) {
   match action {
       Msg::Cache(CacheMsg::AddToCache(payload)) => {

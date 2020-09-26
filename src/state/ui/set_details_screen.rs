@@ -1,5 +1,3 @@
-use seed::prelude::Orders;
-
 use crate::messages::{sets::SetsMsg, Msg};
 use crate::state::entities::Set;
 
@@ -20,7 +18,6 @@ impl SetDetailsScreenModel {
 pub fn update(
     action: &Msg,
     model: &mut SetDetailsScreenModel,
-    orders: &mut impl Orders<Msg>,
 ) {
     match action {
         Msg::Sets(SetsMsg::DeleteSet(_)) => {

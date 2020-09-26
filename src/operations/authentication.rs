@@ -1,4 +1,7 @@
 use graphql_client::GraphQLQuery;
+use seed::prelude::Orders;
+
+use crate::{messages::Msg, state::Model};
 
 #[derive(GraphQLQuery)]
 #[graphql(
@@ -6,3 +9,5 @@ use graphql_client::GraphQLQuery;
     query_path = "src/operations/authentication.graphql"
 )]
 pub struct Register;
+
+pub fn operate(msg: &Msg, model: &Model, orders: &mut impl Orders<Msg>) {}

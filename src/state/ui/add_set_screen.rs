@@ -1,5 +1,3 @@
-use seed::prelude::Orders;
-
 use crate::messages::{sets::SetsMsg, Msg};
 use crate::state::entities::Card;
 
@@ -20,7 +18,6 @@ impl AddSetScreenModel {
 pub fn update(
     action: &Msg,
     model: &mut AddSetScreenModel,
-    orders: &mut impl Orders<Msg>,
 ) {
     match action {
         Msg::Sets(SetsMsg::AddSet(_)) => {

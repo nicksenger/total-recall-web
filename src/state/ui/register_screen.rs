@@ -1,5 +1,3 @@
-use seed::prelude::Orders;
-
 use crate::messages::{authentication::AuthMsg, Msg};
 
 pub struct RegisterScreenModel {
@@ -15,7 +13,6 @@ impl RegisterScreenModel {
 pub fn update(
     action: &Msg,
     model: &mut RegisterScreenModel,
-    orders: &mut impl Orders<Msg>,
 ) {
     match action {
         Msg::Authentication(AuthMsg::Register(_)) => {

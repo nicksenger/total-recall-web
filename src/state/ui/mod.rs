@@ -1,5 +1,3 @@
-use seed::prelude::Orders;
-
 use crate::messages::Msg;
 
 mod add_card_screen;
@@ -49,17 +47,17 @@ impl UIModel {
     }
   }
 
-pub fn update(action: &Msg, model: &mut UIModel, orders: &mut impl Orders<Msg>) {
-    add_card_screen::update(action, &mut model.add_card_screen, orders);
-    add_deck_screen::update(action, &mut model.add_deck_screen, orders);
-    add_set_screen::update(action, &mut model.add_set_screen, orders);
-    card_details_screen::update(action, &mut model.card_details_screen, orders);
-    card_link_screen::update(action, &mut model.card_link_screen, orders);
-    cards_screen::update(action, &mut model.cards_screen, orders);
-    deck_details_screen::update(action, &mut model.deck_details_screen, orders);
-    decks_screen::update(action, &mut model.decks_screen, orders);
-    edit_card_link_screen::update(action, &mut model.edit_card_link_screen, orders);
-    register_screen::update(action, &mut model.register_screen, orders);
-    sets_screen::update(action, &mut model.sets_screen, orders);
-    set_details_screen::update(action, &mut model.set_details_screen, orders);
+pub fn update(action: &Msg, model: &mut UIModel) {
+    add_card_screen::update(action, &mut model.add_card_screen);
+    add_deck_screen::update(action, &mut model.add_deck_screen);
+    add_set_screen::update(action, &mut model.add_set_screen);
+    card_details_screen::update(action, &mut model.card_details_screen);
+    card_link_screen::update(action, &mut model.card_link_screen);
+    cards_screen::update(action, &mut model.cards_screen);
+    deck_details_screen::update(action, &mut model.deck_details_screen);
+    decks_screen::update(action, &mut model.decks_screen);
+    edit_card_link_screen::update(action, &mut model.edit_card_link_screen);
+    register_screen::update(action, &mut model.register_screen);
+    sets_screen::update(action, &mut model.sets_screen);
+    set_details_screen::update(action, &mut model.set_details_screen);
 }

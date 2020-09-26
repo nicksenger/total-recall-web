@@ -1,5 +1,3 @@
-use seed::prelude::Orders;
-
 use crate::messages::{decks::DecksMsg, Msg};
 
 pub struct AddDeckScreenModel {
@@ -15,7 +13,6 @@ impl AddDeckScreenModel {
 pub fn update(
   action: &Msg,
   model: &mut AddDeckScreenModel,
-  orders: &mut impl Orders<Msg>,
 ) {
   match action {
       Msg::Decks(DecksMsg::AddDeck(_))

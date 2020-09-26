@@ -1,5 +1,3 @@
-use seed::prelude::Orders;
-
 use crate::messages::{authentication::AuthMsg, cache::CacheMsg, Msg};
 
 pub struct AuthenticationModel {
@@ -21,7 +19,6 @@ impl AuthenticationModel {
 pub fn update(
     action: &Msg,
     model: &mut AuthenticationModel,
-    orders: &mut impl Orders<Msg>,
 ) {
     match action {
         Msg::Authentication(AuthMsg::AttemptLogin(_)) => {

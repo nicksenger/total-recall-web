@@ -1,5 +1,3 @@
-use seed::prelude::Orders;
-
 use crate::messages::{decks::DecksMsg, Msg};
 use crate::state::entities::Deck;
 
@@ -20,7 +18,6 @@ impl DeckDetailsScreenModel {
 pub fn update(
     action: &Msg,
     model: &mut DeckDetailsScreenModel,
-    orders: &mut impl Orders<Msg>,
 ) {
     match action {
         Msg::Decks(DecksMsg::DeleteDeck(_)) => {

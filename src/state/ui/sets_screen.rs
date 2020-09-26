@@ -1,5 +1,3 @@
-use seed::prelude::Orders;
-
 use crate::messages::{sets::SetsMsg, Msg};
 
 pub struct SetsScreenModel {
@@ -19,7 +17,6 @@ impl SetsScreenModel {
 pub fn update(
     action: &Msg,
     model: &mut SetsScreenModel,
-    orders: &mut impl Orders<Msg>,
 ) {
     match action {
         Msg::Sets(SetsMsg::GetSets(_)) => {

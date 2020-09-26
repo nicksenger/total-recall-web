@@ -1,6 +1,6 @@
 use seed::prelude::Orders;
 
-use super::messages::Msg;
+use super::{messages::Msg, operations::operate};
 
 pub mod authentication;
 pub mod cache;
@@ -29,9 +29,10 @@ impl Model {
 }
 
 pub fn update(action: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
-    authentication::update(&action, &mut model.authentication, orders);
-    cache::update(&action, &mut model.cache, orders);
-    entities::update(&action, &mut model.entities, orders);
-    session::update(&action, &mut model.session, orders);
-    ui::update(&action, &mut model.ui, orders);
+    authentication::update(&action, &mut model.authentication);
+    cache::update(&action, &mut model.cache);
+    entities::update(&action, &mut model.entities);
+    session::update(&action, &mut model.session);
+    ui::update(&action, &mut model.ui);
+    operate(&action, &model, orders);
 }

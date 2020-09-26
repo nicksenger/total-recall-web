@@ -1,5 +1,3 @@
-use seed::prelude::Orders;
-
 use crate::messages::{cards::CardsMsg, Msg};
 
 pub struct CardsScreenModel {
@@ -19,7 +17,6 @@ impl CardsScreenModel {
 pub fn update(
     action: &Msg,
     model: &mut CardsScreenModel,
-    orders: &mut impl Orders<Msg>,
 ) {
     match action {
         Msg::Cards(CardsMsg::GetCards(_)) => {

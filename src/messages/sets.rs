@@ -45,10 +45,17 @@ pub enum SetsMsg {
     AddSetFailed(ErrorPayload),
     AddSetSuccess(AddSetSuccessPayload),
     DeleteSet(DeleteSetPayload),
+    DeleteSetFetched(
+        usize,
+        fetch::Result<Response<sets::delete_set::ResponseData>>,
+    ),
     DeleteSetFailed(ErrorPayload),
     DeleteSetSuccess(DeleteSetSuccessPayload),
     GetSets(GetSetsPayload),
-    GetSetsFetched((usize, fetch::Result<Response<sets::user_sets::ResponseData>>)),
+    GetSetsFetched(
+        usize,
+        fetch::Result<Response<sets::user_sets::ResponseData>>,
+    ),
     GetSetsFailed(ErrorPayload),
     GetSetsSuccess(GetSetsSuccessPayload),
     GotoAddSet(GotoAddSetPayload),
