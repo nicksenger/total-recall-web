@@ -1,4 +1,8 @@
+use graphql_client::Response;
+use seed::prelude::fetch;
+
 use super::ErrorPayload;
+use crate::operations::sets;
 use crate::state::entities::{Card, Set};
 
 pub struct AddSetPayload {
@@ -44,6 +48,7 @@ pub enum SetsMsg {
     DeleteSetFailed(ErrorPayload),
     DeleteSetSuccess(DeleteSetSuccessPayload),
     GetSets(GetSetsPayload),
+    GetSetsFetched((usize, fetch::Result<Response<sets::user_sets::ResponseData>>)),
     GetSetsFailed(ErrorPayload),
     GetSetsSuccess(GetSetsSuccessPayload),
     GotoAddSet(GotoAddSetPayload),

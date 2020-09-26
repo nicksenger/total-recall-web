@@ -1,5 +1,6 @@
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use crate::messages::session::ScoreValue;
 use crate::state::entities::Card;
 
 pub fn needs_review(card: &Card) -> bool {
@@ -17,8 +18,15 @@ fn days_since_seen(card: &Card) -> u128 {
 fn days_until_review(card: &Card) -> u128 {
     sm2(card
         .score
-        .split(",")
-        .map(|s| s.parse::<usize>().unwrap())
+        .iter()
+        .map(|s| match s {
+            ScoreValue::Zero => 0,
+            ScoreValue::One => 1,
+            ScoreValue::Two => 2,
+            ScoreValue::Three => 3,
+            ScoreValue::Four => 4,
+            ScoreValue::Five => 5,
+        })
         .collect())
 }
 

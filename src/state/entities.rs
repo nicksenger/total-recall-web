@@ -7,10 +7,10 @@ use crate::messages::{
     cards::{CardsMsg, GetCardsSuccessPayload},
     decks::{DecksMsg, GetDecksSuccessPayload},
     session::{ScoreValue, SessionMsg},
-    sets::SetsMsg,
+    sets::{GetSetsSuccessPayload, SetsMsg},
     ErrorPayload, Msg,
 };
-use crate::operations::{cards, decks, send_graphql_request};
+use crate::operations::{cards, decks, send_graphql_request, sets};
 
 #[derive(Clone)]
 pub struct Set {
@@ -18,7 +18,7 @@ pub struct Set {
     pub id: usize,
     pub name: String,
     pub owner: String,
-    pub card_ids: String,
+    pub card_ids: Vec<usize>,
 }
 
 #[derive(Clone)]
@@ -37,7 +37,7 @@ pub struct Card {
     pub last_seen: u128,
     pub front: String,
     pub back: String,
-    pub score: String,
+    pub score: Vec<ScoreValue>,
     pub audio: String,
     pub image: String,
     pub link: Option<String>,
@@ -114,16 +114,15 @@ pub fn update(msg: &Msg, model: &mut EntitiesModel, orders: &mut impl Orders<Msg
                                 .scores
                                 .iter()
                                 .map(|s| match s.value {
-                                    cards::deck_cards::ScoreValue::ZERO => "0".to_owned(),
-                                    cards::deck_cards::ScoreValue::ONE => "1".to_owned(),
-                                    cards::deck_cards::ScoreValue::TWO => "2".to_owned(),
-                                    cards::deck_cards::ScoreValue::THREE => "3".to_owned(),
-                                    cards::deck_cards::ScoreValue::FOUR => "4".to_owned(),
-                                    cards::deck_cards::ScoreValue::FIVE => "5".to_owned(),
-                                    _ => "0".to_owned(),
+                                    cards::deck_cards::ScoreValue::ZERO => ScoreValue::Zero,
+                                    cards::deck_cards::ScoreValue::ONE => ScoreValue::One,
+                                    cards::deck_cards::ScoreValue::TWO => ScoreValue::Two,
+                                    cards::deck_cards::ScoreValue::THREE => ScoreValue::Three,
+                                    cards::deck_cards::ScoreValue::FOUR => ScoreValue::Four,
+                                    cards::deck_cards::ScoreValue::FIVE => ScoreValue::Five,
+                                    _ => ScoreValue::Zero,
                                 })
-                                .collect::<Vec<String>>()
-                                .join(","),
+                                .collect::<Vec<ScoreValue>>(),
                             audio: c
                                 .back
                                 .audio
@@ -238,6 +237,48 @@ pub fn update(msg: &Msg, model: &mut EntitiesModel, orders: &mut impl Orders<Msg
             });
         }
 
+        Msg::Sets(SetsMsg::GetSets(payload)) => {
+            let deck_id = payload.deck_id;
+            orders.perform_cmd(async move {
+                Msg::Sets(SetsMsg::GetSetsFetched((
+                    deck_id,
+                    send_graphql_request(&sets::UserSets::build_query(
+                        sets::user_sets::Variables {
+                            deck_id: deck_id as i64,
+                        },
+                    ))
+                    .await,
+                )))
+            });
+        }
+
+        Msg::Sets(SetsMsg::GetSetsFetched((
+            deck_id,
+            Ok(GQLResponse {
+                data: Some(data),
+                errors: None,
+            }),
+        ))) => {
+            orders.send_msg(Msg::Sets(SetsMsg::GetSetsSuccess(GetSetsSuccessPayload {
+                deck_id: *deck_id,
+                sets: data
+                    .sets
+                    .iter()
+                    .map(|s| Set {
+                        id: s.id as usize,
+                        card_ids: s
+                            .cards
+                            .iter()
+                            .map(|c| c.card_id.id as usize)
+                            .collect::<Vec<usize>>(),
+                        deck: *deck_id,
+                        name: s.name.clone(),
+                        owner: s.owner.username.clone(),
+                    })
+                    .collect(),
+            })));
+        }
+
         Msg::Sets(SetsMsg::GetSetsSuccess(payload)) => {
             model
                 .deck_sets
@@ -246,9 +287,9 @@ pub fn update(msg: &Msg, model: &mut EntitiesModel, orders: &mut impl Orders<Msg
                 model.set_cards.insert(
                     set.id,
                     set.card_ids
-                        .split(",")
-                        .map(|s| s.parse::<usize>().unwrap())
+                        .iter()
                         .filter(|card_id| model.cards.contains_key(card_id))
+                        .cloned()
                         .collect(),
                 );
                 model.sets.insert(set.id, set);
@@ -284,16 +325,7 @@ pub fn update(msg: &Msg, model: &mut EntitiesModel, orders: &mut impl Orders<Msg
 
         Msg::Session(SessionMsg::RateCardSuccess(payload)) => {
             if let Some(card) = model.cards.get_mut(&payload.card_id) {
-                let mut new_score = card.score.split(",").collect::<Vec<&str>>();
-                new_score.push(match payload.rating {
-                    ScoreValue::Zero => "0",
-                    ScoreValue::One => "1",
-                    ScoreValue::Two => "2",
-                    ScoreValue::Three => "3",
-                    ScoreValue::Four => "4",
-                    ScoreValue::Five => "5",
-                });
-                card.score = new_score.join(",");
+                card.score.push(payload.rating.clone());
             }
         }
 

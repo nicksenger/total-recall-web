@@ -1,6 +1,7 @@
 use super::ErrorPayload;
 use crate::state::entities::Card;
 
+#[derive(Clone)]
 pub enum ScoreValue {
     Zero,
     One,
