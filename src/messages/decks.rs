@@ -1,4 +1,8 @@
+use graphql_client::Response;
+use seed::prelude::fetch;
+
 use super::ErrorPayload;
+use crate::operations::decks;
 use crate::state::entities::{Deck, Language};
 
 pub struct AddDeckPayload {
@@ -48,6 +52,7 @@ pub enum DecksMsg {
     DeleteDeckFailed(ErrorPayload),
     DeleteDeckSuccess(DeleteDeckSuccessPayload),
     GetDecks(GetDecksPayload),
+    GetDecksFetched((String, fetch::Result<Response<decks::user_decks::ResponseData>>)),
     GetDecksFailed(ErrorPayload),
     GetDecksSuccess(GetDecksSuccessPayload),
     GetLanguages,

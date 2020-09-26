@@ -5,12 +5,12 @@ use seed::prelude::Orders;
 
 use crate::messages::{
     cards::{CardsMsg, GetCardsSuccessPayload},
-    decks::DecksMsg,
+    decks::{DecksMsg, GetDecksSuccessPayload},
     session::{ScoreValue, SessionMsg},
     sets::SetsMsg,
     ErrorPayload, Msg,
 };
-use crate::operations::{cards, send_graphql_request};
+use crate::operations::{cards, decks, send_graphql_request};
 
 #[derive(Clone)]
 pub struct Set {
@@ -98,9 +98,6 @@ pub fn update(msg: &Msg, model: &mut EntitiesModel, orders: &mut impl Orders<Msg
                 errors: None,
             }),
         ))) => {
-            orders.send_msg(Msg::Cards(CardsMsg::GetCardsFailed(ErrorPayload {
-                content: "Failed to retrieve cards.".to_owned(),
-            })));
             orders.send_msg(Msg::Cards(CardsMsg::GetCardsSuccess(
                 GetCardsSuccessPayload {
                     deck_id: *deck_id,
@@ -146,6 +143,21 @@ pub fn update(msg: &Msg, model: &mut EntitiesModel, orders: &mut impl Orders<Msg
             )));
         }
 
+        Msg::Cards(CardsMsg::GetCardsFetched((
+            _,
+            Ok(GQLResponse {
+                data: _,
+                errors: Some(errors),
+            }),
+        ))) => {
+            orders.send_msg(Msg::Cards(CardsMsg::GetCardsFailed(ErrorPayload {
+                content: errors
+                    .last()
+                    .map(|e| e.message.to_owned())
+                    .unwrap_or("Failed to retrieve cards.".to_owned()),
+            })));
+        }
+
         Msg::Cards(CardsMsg::GetCardsFetched(_)) => {
             orders.send_msg(Msg::Cards(CardsMsg::GetCardsFailed(ErrorPayload {
                 content: "Failed to retrieve cards.".to_owned(),
@@ -160,6 +172,64 @@ pub fn update(msg: &Msg, model: &mut EntitiesModel, orders: &mut impl Orders<Msg
             payload.cards.iter().cloned().for_each(|card| {
                 model.cards.insert(card.id, card);
             });
+        }
+
+        Msg::Decks(DecksMsg::GetDecks(payload)) => {
+            let username = payload.username.clone();
+            orders.perform_cmd(async move {
+                Msg::Decks(DecksMsg::GetDecksFetched((
+                    username.clone(),
+                    send_graphql_request(&decks::UserDecks::build_query(
+                        decks::user_decks::Variables { username },
+                    ))
+                    .await,
+                )))
+            });
+        }
+
+        Msg::Decks(DecksMsg::GetDecksFetched((
+            username,
+            Ok(GQLResponse {
+                data: Some(data),
+                errors: None,
+            }),
+        ))) => {
+            orders.send_msg(Msg::Decks(DecksMsg::GetDecksSuccess(
+                GetDecksSuccessPayload {
+                    decks: data
+                        .decks
+                        .iter()
+                        .map(|d| Deck {
+                            id: d.id as usize,
+                            language: d.language.name.clone(),
+                            created: 0,
+                            name: d.name.clone(),
+                            owner: username.to_owned(),
+                        })
+                        .collect(),
+                },
+            )));
+        }
+
+        Msg::Decks(DecksMsg::GetDecksFetched((
+            _,
+            Ok(GQLResponse {
+                data: _,
+                errors: Some(errors),
+            }),
+        ))) => {
+            orders.send_msg(Msg::Decks(DecksMsg::GetDecksFailed(ErrorPayload {
+                content: errors
+                    .last()
+                    .map(|e| e.message.to_owned())
+                    .unwrap_or("Failed to retrieve decks.".to_owned()),
+            })));
+        }
+
+        Msg::Decks(DecksMsg::GetDecksFetched(_)) => {
+            orders.send_msg(Msg::Cards(CardsMsg::GetCardsFailed(ErrorPayload {
+                content: "Failed to retrieve decks.".to_owned(),
+            })));
         }
 
         Msg::Decks(DecksMsg::GetDecksSuccess(payload)) => {
@@ -232,6 +302,8 @@ pub fn update(msg: &Msg, model: &mut EntitiesModel, orders: &mut impl Orders<Msg
                 model.languages.insert(l.id, l);
             });
         }
+
+        Msg::Cards(_) => {}
 
         _ => {}
     }
