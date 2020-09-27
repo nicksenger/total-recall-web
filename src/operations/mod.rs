@@ -1,15 +1,13 @@
 use seed::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::{messages::Msg, state::Model};
+use crate::{messages::Msg, state::Model, BASE_URI};
 
 pub mod authentication;
 pub mod cards;
 pub mod decks;
 pub mod session;
 pub mod sets;
-
-const API_URL: &str = "https://trc.nsenger.com/graphql/";
 
 pub fn operate(msg: &Msg, model: &Model, orders: &mut impl Orders<Msg>) {
     authentication::operate(msg, model, orders);
@@ -24,7 +22,7 @@ where
     V: Serialize,
     T: for<'de> Deserialize<'de> + 'static,
 {
-    Request::new(API_URL)
+    Request::new(format!("{}/graphql/", BASE_URI))
         .method(Method::Post)
         .json(variables)?
         .fetch()

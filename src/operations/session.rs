@@ -1,7 +1,16 @@
-use graphql_client::GraphQLQuery;
+use graphql_client::{GraphQLQuery, Response as GQLResponse};
 use seed::prelude::Orders;
 
-use crate::{messages::Msg, state::Model};
+use super::send_graphql_request;
+use crate::{
+    messages::{
+        session::{RateCardSuccessPayload, ScoreValue, SessionMsg},
+        ErrorPayload, Msg,
+    },
+    operations::session,
+    state::Model,
+    utilities::gql::get_gql_error_message,
+};
 
 #[derive(GraphQLQuery)]
 #[graphql(
@@ -10,4 +19,53 @@ use crate::{messages::Msg, state::Model};
 )]
 pub struct RateCard;
 
-pub fn operate(msg: &Msg, model: &Model, orders: &mut impl Orders<Msg>) {}
+pub fn operate(msg: &Msg, _model: &Model, orders: &mut impl Orders<Msg>) {
+    match msg {
+        Msg::Session(SessionMsg::RateCard(payload)) => {
+            let card_id = payload.card_id;
+            let score = payload.rating.clone();
+            orders.perform_cmd(async move {
+                Msg::Session(SessionMsg::RateCardFetched(
+                    card_id,
+                    score.clone(),
+                    send_graphql_request(&RateCard::build_query(rate_card::Variables {
+                        card_id: card_id as i64,
+                        rating: match score {
+                            ScoreValue::Zero => session::rate_card::ScoreValue::ZERO,
+                            ScoreValue::One => session::rate_card::ScoreValue::ONE,
+                            ScoreValue::Two => session::rate_card::ScoreValue::TWO,
+                            ScoreValue::Three => session::rate_card::ScoreValue::THREE,
+                            ScoreValue::Four => session::rate_card::ScoreValue::FOUR,
+                            ScoreValue::Five => session::rate_card::ScoreValue::FIVE,
+                        },
+                    }))
+                    .await,
+                ))
+            });
+        }
+
+        Msg::Session(SessionMsg::RateCardFetched(
+            card_id,
+            score,
+            Ok(GQLResponse {
+                data: Some(_),
+                errors: None,
+            }),
+        )) => {
+            orders.send_msg(Msg::Session(SessionMsg::RateCardSuccess(
+                RateCardSuccessPayload {
+                    card_id: *card_id,
+                    rating: score.clone(),
+                },
+            )));
+        }
+
+        Msg::Session(SessionMsg::RateCardFetched(_, _, x)) => {
+            orders.send_msg(Msg::Session(SessionMsg::RateCardFailed(ErrorPayload {
+                content: get_gql_error_message(x, "Failed to score card."),
+            })));
+        }
+
+        _ => {}
+    }
+}

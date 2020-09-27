@@ -1,4 +1,8 @@
+use graphql_client::Response;
+use seed::prelude::fetch;
+
 use super::ErrorPayload;
+use crate::operations::session;
 use crate::state::entities::Card;
 
 #[derive(Clone)]
@@ -35,6 +39,11 @@ pub struct StudyPayload {
 
 pub enum SessionMsg {
     RateCard(RateCardPayload),
+    RateCardFetched(
+        usize,
+        ScoreValue,
+        fetch::Result<Response<session::rate_card::ResponseData>>,
+    ),
     RateCardFailed(ErrorPayload),
     RateCardSuccess(RateCardSuccessPayload),
     RevealCard(RevealCardPayload),
