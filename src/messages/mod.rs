@@ -1,5 +1,4 @@
 pub mod authentication;
-pub mod cache;
 pub mod cards;
 pub mod decks;
 pub mod session;
@@ -11,7 +10,6 @@ pub struct ErrorPayload {
 
 pub enum Msg {
     Authentication(authentication::AuthMsg),
-    Cache(cache::CacheMsg),
     Cards(cards::CardsMsg),
     Decks(decks::DecksMsg),
     Session(session::SessionMsg),
