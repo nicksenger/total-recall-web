@@ -65,7 +65,7 @@ pub fn operate(msg: &Msg, _model: &Model, orders: &mut impl Orders<Msg>) {
 
         Msg::Authentication(AuthMsg::Register(payload)) => {
             let username = payload.username.clone();
-            let password = payload.username.clone();
+            let password = payload.password.clone();
             orders.perform_cmd(async move {
                 Msg::Authentication(AuthMsg::RegistrationFetched(
                     send_graphql_request(&Register::build_query(register::Variables {

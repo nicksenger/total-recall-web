@@ -31,7 +31,10 @@ pub fn view(model: &Model, username: &str, deck_id: usize) -> Node<Msg> {
                 .entities
                 .sets
                 .get(set_id)
-                .map(|s| li![a![s.name.to_owned()]])
+                .map(|s| li![a![
+                    s.name.to_owned(),
+                    attrs! { At::Href => Route::SetDetails(s.id) }
+                ]])
                 .unwrap_or(div![])))
             .unwrap()],
         br![],

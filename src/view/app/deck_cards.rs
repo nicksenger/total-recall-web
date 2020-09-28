@@ -1,3 +1,6 @@
+use std::collections::HashSet;
+
+use seed::virtual_dom::update_el::UpdateEl;
 use seed::{prelude::*, *};
 use seed_hooks::*;
 
@@ -11,6 +14,8 @@ pub fn view(model: &Model, username: &str, deck_id: usize) -> Node<Msg> {
     if model.ui.cards_screen.loading {
         return p!["loading..."];
     }
+
+    let selected_cards = use_state(HashSet::<usize>::new);
 
     div![
         h3![format!(
@@ -31,7 +36,30 @@ pub fn view(model: &Model, username: &str, deck_id: usize) -> Node<Msg> {
                 .entities
                 .cards
                 .get(card_id)
-                .map(|c| li![a![c.front.to_owned()]])
+                .map(|c| {
+                    let id = c.id;
+                    li![
+                        input![
+                            ev(Ev::Change, move |_| {
+                                if selected_cards.get().contains(&id) {
+                                    selected_cards.get().remove(&id);
+                                } else {
+                                    selected_cards.get().insert(id);
+                                }
+                            }),
+                            attrs! { At::Type => "checkbox" },
+                            if selected_cards.get().contains(&id) {
+                                attrs! { At::Checked => true }
+                            } else {
+                                attrs! {}
+                            }
+                        ],
+                        a![
+                            c.front.to_owned(),
+                            attrs! { At::Href => Route::CardDetails(c.id) }
+                        ]
+                    ]
+                })
                 .unwrap_or(div![])))
             .unwrap()],
         br![],

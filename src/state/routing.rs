@@ -6,18 +6,22 @@ use crate::messages::{routing::RoutingMessage, Msg};
 
 #[derive(Clone, Debug)]
 pub enum Route {
+    Home,
     Login,
     Register,
     Decks(String),
     DeckCards(String, usize),
     DeckSets(String, usize),
+    CardDetails(usize),
+    SetDetails(usize),
     NotFound,
 }
 
 impl Route {
     pub fn path(&self) -> Vec<String> {
         match self {
-            Route::Login => vec![],
+            Route::Home => vec![],
+            Route::Login => vec!["login".to_owned()],
             Route::Register => vec!["register".to_owned()],
             Route::Decks(username) => {
                 vec!["user".to_owned(), username.to_owned(), "decks".to_owned()]
@@ -36,6 +40,8 @@ impl Route {
                 format!("{}", deck_id),
                 "sets".to_owned(),
             ],
+            Route::CardDetails(card_id) => vec!["cards".to_owned(), format!("{}", card_id)],
+            Route::SetDetails(set_id) => vec!["sets".to_owned(), format!("{}", set_id)],
             Route::NotFound => vec![],
         }
     }
@@ -50,7 +56,8 @@ impl fmt::Display for Route {
 impl From<&Route> for seed::Url {
     fn from(route: &Route) -> Self {
         match route {
-            Route::Login => seed::Url::new(),
+            Route::Home => seed::Url::new(),
+            Route::Login => seed::Url::new().add_path_part("login"),
             Route::Register => seed::Url::new().add_path_part("register"),
             Route::Decks(username) => seed::Url::new()
                 .add_path_part("user")
@@ -68,6 +75,12 @@ impl From<&Route> for seed::Url {
                 .add_path_part("decks")
                 .add_path_part(format!("{}", deck_id))
                 .add_path_part("sets"),
+            Route::CardDetails(card_id) => seed::Url::new()
+                .add_path_part("cards")
+                .add_path_part(format!("{}", card_id)),
+            Route::SetDetails(set_id) => seed::Url::new()
+                .add_path_part("sets")
+                .add_path_part(format!("{}", set_id)),
             Route::NotFound => seed::Url::new(),
         }
     }
@@ -79,8 +92,23 @@ impl TryFrom<Url> for Route {
     fn try_from(url: seed::Url) -> Result<Self, Self::Error> {
         let mut path = url.path().into_iter();
         match path.next().as_ref().map(|s| s.as_str()) {
-            None | Some("") => Ok(Route::Login),
+            None | Some("") => Ok(Route::Home),
+            Some("login") => Ok(Route::Login),
             Some("register") => Ok(Route::Register),
+            Some("cards") => match path.next().as_ref().map(|s| s.as_str()) {
+                Some(id) => id
+                    .parse::<usize>()
+                    .map(|card_id| Ok(Route::CardDetails(card_id)))
+                    .unwrap_or(Err(())),
+                _ => Err(()),
+            },
+            Some("sets") => match path.next().as_ref().map(|s| s.as_str()) {
+                Some(id) => id
+                    .parse::<usize>()
+                    .map(|set_id| Ok(Route::SetDetails(set_id)))
+                    .unwrap_or(Err(())),
+                _ => Err(()),
+            },
             Some("user") => match path.next().as_ref().map(|s| s.as_str()) {
                 Some(username) => match path.next().as_ref().map(|s| s.as_str()) {
                     Some("decks") => match path.next().as_ref().map(|s| s.as_str()) {
