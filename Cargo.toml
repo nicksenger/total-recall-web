@@ -16,6 +16,7 @@ crate-type = ["cdylib"]
 wasm-bindgen-test = "0.3.13"
 
 [dependencies]
+seed_hooks = "0.1.4"
 graphql_client = "^0.9"
 rand = "^0.7"
 seed = { git = "https://github.com/seed-rs/seed", rev = "0a538f0" }

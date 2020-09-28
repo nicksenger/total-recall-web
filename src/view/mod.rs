@@ -1,7 +1,20 @@
-use seed::{prelude::*, *};
+use seed::prelude::*;
+use seed_hooks::*;
 
-use crate::{messages::Msg, state::Model};
+use crate::{
+    messages::Msg,
+    state::{routing::Route, Model},
+};
 
-pub fn root(_model: &Model) -> Node<Msg> {
-    h3!["Total Recall Web"]
+mod app;
+mod auth;
+mod not_found;
+
+#[topo::nested]
+pub fn root(model: &Model) -> Node<Msg> {
+    match model.routing.route {
+        Route::Login | Route::Register => auth::view(model),
+        Route::NotFound => not_found::view(model),
+        _ => app::view(model),
+    }
 }

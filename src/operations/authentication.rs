@@ -25,7 +25,7 @@ async fn authenticate(
     username: String,
     password: String,
 ) -> fetch::Result<AuthenticationResponseBody> {
-    Request::new(format!("{}/login/", BASE_URI))
+    Request::new(format!("{}/login", BASE_URI))
         .method(Method::Post)
         .json(&AuthenticationRequestBody { username, password })?
         .fetch()
