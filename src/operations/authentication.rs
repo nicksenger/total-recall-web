@@ -1,7 +1,6 @@
 use graphql_client::{GraphQLQuery, Response as GQLResponse};
 use seed::prelude::*;
 
-use super::send_graphql_request;
 use crate::{
     messages::{
         authentication::{
@@ -10,7 +9,7 @@ use crate::{
         ErrorPayload, Msg,
     },
     state::Model,
-    utilities::gql::get_gql_error_message,
+    utilities::gql::{get_gql_error_message, send_graphql_request},
     BASE_URI,
 };
 
@@ -35,7 +34,7 @@ async fn authenticate(
         .await
 }
 
-pub fn operate(msg: &Msg, _model: &Model, orders: &mut impl Orders<Msg>) {
+pub fn operate(msg: &Msg, model: &Model, orders: &mut impl Orders<Msg>) {
     match msg {
         Msg::Authentication(AuthMsg::AttemptLogin(payload)) => {
             let username = payload.username.clone();
@@ -64,6 +63,7 @@ pub fn operate(msg: &Msg, _model: &Model, orders: &mut impl Orders<Msg>) {
         }
 
         Msg::Authentication(AuthMsg::Register(payload)) => {
+            let token = model.authentication.token.clone();
             let username = payload.username.clone();
             let password = payload.password.clone();
             orders.perform_cmd(async move {
@@ -71,7 +71,7 @@ pub fn operate(msg: &Msg, _model: &Model, orders: &mut impl Orders<Msg>) {
                     send_graphql_request(&Register::build_query(register::Variables {
                         username,
                         password,
-                    }))
+                    }), token)
                     .await,
                 ))
             });

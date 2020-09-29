@@ -11,9 +11,13 @@ pub enum Route {
     Register,
     Decks(String),
     DeckCards(String, usize),
+    DeckDetails(String, usize),
     DeckSets(String, usize),
     CardDetails(usize),
     SetDetails(usize),
+    AddDeck(String),
+    AddCard(String, usize),
+    AddSet(String, usize),
     NotFound,
 }
 
@@ -42,6 +46,31 @@ impl Route {
             ],
             Route::CardDetails(card_id) => vec!["cards".to_owned(), format!("{}", card_id)],
             Route::SetDetails(set_id) => vec!["sets".to_owned(), format!("{}", set_id)],
+            Route::AddDeck(username) => vec![
+                "user".to_owned(),
+                username.to_owned(),
+                "add-deck".to_owned(),
+            ],
+            Route::DeckDetails(username, deck_id) => vec![
+                "user".to_owned(),
+                username.to_owned(),
+                "decks".to_owned(),
+                format!("{}", deck_id),
+            ],
+            Route::AddCard(username, deck_id) => vec![
+                "user".to_owned(),
+                username.to_owned(),
+                "decks".to_owned(),
+                format!("{}", deck_id),
+                "add-card".to_owned(),
+            ],
+            Route::AddSet(username, deck_id) => vec![
+                "user".to_owned(),
+                username.to_owned(),
+                "decks".to_owned(),
+                format!("{}", deck_id),
+                "add-set".to_owned(),
+            ],
             Route::NotFound => vec![],
         }
     }
@@ -81,6 +110,27 @@ impl From<&Route> for seed::Url {
             Route::SetDetails(set_id) => seed::Url::new()
                 .add_path_part("sets")
                 .add_path_part(format!("{}", set_id)),
+            Route::AddDeck(username) => seed::Url::new()
+                .add_path_part("user")
+                .add_path_part(username.as_str())
+                .add_path_part("add-deck"),
+            Route::DeckDetails(username, deck_id) => seed::Url::new()
+                .add_path_part("user")
+                .add_path_part(username.as_str())
+                .add_path_part("decks")
+                .add_path_part(format!("{}", deck_id)),
+            Route::AddCard(username, deck_id) => seed::Url::new()
+                .add_path_part("user")
+                .add_path_part(username.as_str())
+                .add_path_part("decks")
+                .add_path_part(format!("{}", deck_id))
+                .add_path_part("add-card"),
+            Route::AddSet(username, deck_id) => seed::Url::new()
+                .add_path_part("user")
+                .add_path_part(username.as_str())
+                .add_path_part("decks")
+                .add_path_part(format!("{}", deck_id))
+                .add_path_part("add-set"),
             Route::NotFound => seed::Url::new(),
         }
     }
@@ -111,12 +161,18 @@ impl TryFrom<Url> for Route {
             },
             Some("user") => match path.next().as_ref().map(|s| s.as_str()) {
                 Some(username) => match path.next().as_ref().map(|s| s.as_str()) {
+                    Some("add-deck") => Ok(Route::AddDeck(username.to_owned())),
                     Some("decks") => match path.next().as_ref().map(|s| s.as_str()) {
                         Some(deck_id) => deck_id
                             .parse::<usize>()
                             .map(|deck_id| match path.next().as_ref().map(|s| s.as_str()) {
                                 Some("cards") => Ok(Route::DeckCards(username.to_owned(), deck_id)),
                                 Some("sets") => Ok(Route::DeckSets(username.to_owned(), deck_id)),
+                                Some("add-card") => {
+                                    Ok(Route::AddCard(username.to_owned(), deck_id))
+                                }
+                                Some("add-set") => Ok(Route::AddSet(username.to_owned(), deck_id)),
+                                None => Ok(Route::DeckDetails(username.to_owned(), deck_id)),
                                 _ => Err(()),
                             })
                             .unwrap_or(Err(())),

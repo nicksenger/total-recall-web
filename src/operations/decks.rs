@@ -1,7 +1,6 @@
 use graphql_client::{GraphQLQuery, Response as GQLResponse};
 use seed::prelude::Orders;
 
-use super::send_graphql_request;
 use crate::{
     messages::{
         decks::{
@@ -14,7 +13,7 @@ use crate::{
         entities::{Deck, Language},
         Model,
     },
-    utilities::gql::get_gql_error_message,
+    utilities::gql::{get_gql_error_message, send_graphql_request},
 };
 
 type BigInt = u128;
@@ -35,19 +34,20 @@ generate_query!(UserDecks);
 generate_query!(CreateDeck);
 generate_query!(DeleteDeck);
 
-pub fn operate(msg: &Msg, _model: &Model, orders: &mut impl Orders<Msg>) {
+pub fn operate(msg: &Msg, model: &Model, orders: &mut impl Orders<Msg>) {
     match msg {
         Msg::Decks(DecksMsg::AddDeck(payload)) => {
+            let token = model.authentication.token.clone();
             let username = payload.username.clone();
             let name = payload.name.clone();
             let language = payload.language as i64;
             orders.perform_cmd(async move {
                 Msg::Decks(DecksMsg::AddDeckFetched(
                     username,
-                    send_graphql_request(&CreateDeck::build_query(create_deck::Variables {
-                        name,
-                        language,
-                    }))
+                    send_graphql_request(
+                        &CreateDeck::build_query(create_deck::Variables { name, language }),
+                        token,
+                    )
                     .await,
                 ))
             });
@@ -85,13 +85,15 @@ pub fn operate(msg: &Msg, _model: &Model, orders: &mut impl Orders<Msg>) {
         }
 
         Msg::Decks(DecksMsg::GetDecks(payload)) => {
+            let token = model.authentication.token.clone();
             let username = payload.username.clone();
             orders.perform_cmd(async move {
                 Msg::Decks(DecksMsg::GetDecksFetched(
                     username.clone(),
-                    send_graphql_request(&UserDecks::build_query(user_decks::Variables {
-                        username,
-                    }))
+                    send_graphql_request(
+                        &UserDecks::build_query(user_decks::Variables { username }),
+                        token,
+                    )
                     .await,
                 ))
             });
@@ -128,13 +130,15 @@ pub fn operate(msg: &Msg, _model: &Model, orders: &mut impl Orders<Msg>) {
         }
 
         Msg::Decks(DecksMsg::DeleteDeck(payload)) => {
+            let token = model.authentication.token.clone();
             let deck_id = payload.deck_id;
             orders.perform_cmd(async move {
                 Msg::Decks(DecksMsg::DeleteDeckFetched(
                     deck_id,
-                    send_graphql_request(&DeleteDeck::build_query(delete_deck::Variables {
-                        id: deck_id as i64,
-                    }))
+                    send_graphql_request(
+                        &DeleteDeck::build_query(delete_deck::Variables { id: deck_id as i64 }),
+                        token,
+                    )
                     .await,
                 ))
             });
@@ -159,10 +163,14 @@ pub fn operate(msg: &Msg, _model: &Model, orders: &mut impl Orders<Msg>) {
         }
 
         Msg::Decks(DecksMsg::GetLanguages) => {
+            let token = model.authentication.token.clone();
             orders.perform_cmd(async move {
                 Msg::Decks(DecksMsg::GetLanguagesFetched(
-                    send_graphql_request(&LanguageList::build_query(language_list::Variables {}))
-                        .await,
+                    send_graphql_request(
+                        &LanguageList::build_query(language_list::Variables {}),
+                        token,
+                    )
+                    .await,
                 ))
             });
         }

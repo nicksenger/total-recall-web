@@ -1,7 +1,6 @@
 use graphql_client::{GraphQLQuery, Response as GQLResponse};
 use seed::prelude::Orders;
 
-use super::send_graphql_request;
 use crate::{
     messages::{
         session::{RateCardSuccessPayload, ScoreValue, SessionMsg},
@@ -9,7 +8,7 @@ use crate::{
     },
     operations::session,
     state::Model,
-    utilities::gql::get_gql_error_message,
+    utilities::gql::{get_gql_error_message, send_graphql_request},
 };
 
 #[derive(GraphQLQuery)]
@@ -19,9 +18,10 @@ use crate::{
 )]
 pub struct RateCard;
 
-pub fn operate(msg: &Msg, _model: &Model, orders: &mut impl Orders<Msg>) {
+pub fn operate(msg: &Msg, model: &Model, orders: &mut impl Orders<Msg>) {
     match msg {
         Msg::Session(SessionMsg::RateCard(payload)) => {
+            let token = model.authentication.token.clone();
             let card_id = payload.card_id;
             let score = payload.rating.clone();
             orders.perform_cmd(async move {
@@ -38,7 +38,7 @@ pub fn operate(msg: &Msg, _model: &Model, orders: &mut impl Orders<Msg>) {
                             ScoreValue::Four => session::rate_card::ScoreValue::FOUR,
                             ScoreValue::Five => session::rate_card::ScoreValue::FIVE,
                         },
-                    }))
+                    }), token)
                     .await,
                 ))
             });

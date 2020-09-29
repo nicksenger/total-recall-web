@@ -18,18 +18,3 @@ pub fn operate(msg: &Msg, model: &Model, orders: &mut impl Orders<Msg>) {
     session::operate(msg, model, orders);
     sets::operate(msg, model, orders);
 }
-
-pub async fn send_graphql_request<V, T>(variables: &V) -> fetch::Result<T>
-where
-    V: Serialize,
-    T: for<'de> Deserialize<'de> + 'static,
-{
-    Request::new(format!("{}/graphql", BASE_URI))
-        .method(Method::Post)
-        .json(variables)?
-        .fetch()
-        .await?
-        .check_status()?
-        .json()
-        .await
-}

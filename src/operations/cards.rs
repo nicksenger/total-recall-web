@@ -1,7 +1,6 @@
 use graphql_client::{GraphQLQuery, Response as GQLResponse};
 use seed::prelude::Orders;
 
-use super::send_graphql_request;
 use crate::{
     messages::{
         cards::{
@@ -12,7 +11,7 @@ use crate::{
         ErrorPayload, Msg,
     },
     state::{entities::Card, Model},
-    utilities::gql::get_gql_error_message,
+    utilities::gql::{get_gql_error_message, send_graphql_request},
 };
 
 type BigInt = u128;
@@ -33,12 +32,13 @@ generate_query!(CreateCard);
 generate_query!(DeleteCard);
 generate_query!(EditCardLink);
 
-pub fn operate(msg: &Msg, _model: &Model, orders: &mut impl Orders<Msg>) {
+pub fn operate(msg: &Msg, model: &Model, orders: &mut impl Orders<Msg>) {
     match msg {
         Msg::Cards(CardsMsg::AddCard(payload)) => {
+            let token = model.authentication.token.clone();
             let deck_id = payload.deck_id;
             let back = payload.back.clone();
-            let front = payload.back.clone();
+            let front = payload.front.clone();
             let link = payload.link.clone();
             orders.perform_cmd(async move {
                 Msg::Cards(CardsMsg::AddCardFetched(
@@ -48,7 +48,7 @@ pub fn operate(msg: &Msg, _model: &Model, orders: &mut impl Orders<Msg>) {
                         back,
                         front,
                         link,
-                    }))
+                    }), token)
                     .await,
                 ))
             });
@@ -73,13 +73,14 @@ pub fn operate(msg: &Msg, _model: &Model, orders: &mut impl Orders<Msg>) {
         }
 
         Msg::Cards(CardsMsg::GetCards(payload)) => {
+            let token = model.authentication.token.clone();
             let deck_id = payload.deck_id;
             orders.perform_cmd(async move {
                 Msg::Cards(CardsMsg::GetCardsFetched(
                     deck_id,
                     send_graphql_request(&DeckCards::build_query(deck_cards::Variables {
                         deck_id: deck_id as i64,
-                    }))
+                    }), token)
                     .await,
                 ))
             });
@@ -143,6 +144,7 @@ pub fn operate(msg: &Msg, _model: &Model, orders: &mut impl Orders<Msg>) {
         }
 
         Msg::Cards(CardsMsg::EditCardLink(payload)) => {
+            let token = model.authentication.token.clone();
             let card_id = payload.card_id;
             let link = payload.link.clone();
             orders.perform_cmd(async move {
@@ -152,7 +154,7 @@ pub fn operate(msg: &Msg, _model: &Model, orders: &mut impl Orders<Msg>) {
                     send_graphql_request(&EditCardLink::build_query(edit_card_link::Variables {
                         card_id: card_id as i64,
                         link,
-                    }))
+                    }), token)
                     .await,
                 ))
             });
@@ -181,13 +183,14 @@ pub fn operate(msg: &Msg, _model: &Model, orders: &mut impl Orders<Msg>) {
         }
 
         Msg::Cards(CardsMsg::DeleteCard(payload)) => {
+            let token = model.authentication.token.clone();
             let card_id = payload.card_id;
             orders.perform_cmd(async move {
                 Msg::Cards(CardsMsg::DeleteCardFetched(
                     card_id,
                     send_graphql_request(&DeleteCard::build_query(delete_card::Variables {
                         card_id: card_id as i64,
-                    }))
+                    }), token)
                     .await,
                 ))
             });

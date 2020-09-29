@@ -16,10 +16,7 @@ impl AuthenticationModel {
     }
 }
 
-pub fn update(
-    action: &Msg,
-    model: &mut AuthenticationModel,
-) {
+pub fn update(action: &Msg, model: &mut AuthenticationModel) {
     match action {
         Msg::Authentication(AuthMsg::AttemptLogin(_)) => {
             model.loading = true;
@@ -35,6 +32,11 @@ pub fn update(
             model.loading = false;
             model.token = Some(payload.token.clone());
             model.username = Some(payload.username.clone());
+        }
+
+        Msg::Authentication(AuthMsg::Logout) => {
+            model.token = None;
+            model.username = None;
         }
 
         _ => {}

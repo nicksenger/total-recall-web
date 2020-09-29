@@ -1,15 +1,14 @@
 use crate::messages::{sets::SetsMsg, Msg};
-use crate::state::entities::Card;
 
 pub struct AddSetScreenModel {
-    pub cards: Vec<Card>,
+    pub card_ids: Vec<usize>,
     pub loading: bool,
 }
 
 impl AddSetScreenModel {
     pub fn new() -> Self {
         Self {
-            cards: vec![],
+            card_ids: vec![],
             loading: false,
         }
     }
@@ -30,7 +29,7 @@ pub fn update(
         }
 
         Msg::Sets(SetsMsg::GotoAddSet(payload)) => {
-            model.cards = payload.cards.clone();
+            model.card_ids = payload.cards.clone();
         }
 
         _ => {}

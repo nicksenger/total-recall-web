@@ -15,7 +15,18 @@ pub fn view(model: &Model) -> Node<Msg> {
     let password = use_state(String::new);
 
     if model.authentication.loading {
-        return p!["loading..."]
+        return p!["loading..."];
+    }
+
+    if let Some(username) = &model.authentication.username {
+        return p![
+            format!("Logged in as {}. ", username),
+            button![
+                "click here",
+                ev(Ev::Click, |_| Msg::Authentication(AuthMsg::Logout))
+            ],
+            " to log out."
+        ];
     }
 
     div![
@@ -45,6 +56,9 @@ pub fn view(model: &Model) -> Node<Msg> {
         ],
         br![],
         br![],
-        p!["Don't have an account? ", a!["Register", attrs! { At::Href => Route::Register }]]
+        p![
+            "Don't have an account? ",
+            a!["Register", attrs! { At::Href => Route::Register }]
+        ]
     ]
 }

@@ -1,14 +1,13 @@
 use graphql_client::{GraphQLQuery, Response as GQLResponse};
 use seed::prelude::Orders;
 
-use super::send_graphql_request;
 use crate::{
     messages::{
         sets::{AddSetSuccessPayload, DeleteSetSuccessPayload, GetSetsSuccessPayload, SetsMsg},
         ErrorPayload, Msg,
     },
     state::{entities::Set, Model},
-    utilities::gql::get_gql_error_message,
+    utilities::gql::{get_gql_error_message, send_graphql_request},
 };
 
 type BigInt = u128;
@@ -28,9 +27,10 @@ generate_query!(UserSets);
 generate_query!(CreateSet);
 generate_query!(DeleteSet);
 
-pub fn operate(msg: &Msg, _model: &Model, orders: &mut impl Orders<Msg>) {
+pub fn operate(msg: &Msg, model: &Model, orders: &mut impl Orders<Msg>) {
     match msg {
         Msg::Sets(SetsMsg::AddSet(payload)) => {
+            let token = model.authentication.token.clone();
             let deck_id = payload.deck_id;
             let card_ids = payload
                 .card_ids
@@ -45,7 +45,7 @@ pub fn operate(msg: &Msg, _model: &Model, orders: &mut impl Orders<Msg>) {
                         deck_id: deck_id as i64,
                         card_ids,
                         name,
-                    }))
+                    }), token)
                     .await,
                 ))
             });
@@ -70,13 +70,14 @@ pub fn operate(msg: &Msg, _model: &Model, orders: &mut impl Orders<Msg>) {
         }
 
         Msg::Sets(SetsMsg::GetSets(payload)) => {
+            let token = model.authentication.token.clone();
             let deck_id = payload.deck_id;
             orders.perform_cmd(async move {
                 Msg::Sets(SetsMsg::GetSetsFetched(
                     deck_id,
                     send_graphql_request(&UserSets::build_query(user_sets::Variables {
                         deck_id: deck_id as i64,
-                    }))
+                    }), token)
                     .await,
                 ))
             });
@@ -116,13 +117,14 @@ pub fn operate(msg: &Msg, _model: &Model, orders: &mut impl Orders<Msg>) {
         }
 
         Msg::Sets(SetsMsg::DeleteSet(payload)) => {
+            let token = model.authentication.token.clone();
             let set_id = payload.set_id;
             orders.perform_cmd(async move {
                 Msg::Sets(SetsMsg::DeleteSetFetched(
                     set_id,
                     send_graphql_request(&DeleteSet::build_query(delete_set::Variables {
                         set_id: set_id as i64,
-                    }))
+                    }), token)
                     .await,
                 ))
             });

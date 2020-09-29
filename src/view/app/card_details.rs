@@ -2,8 +2,11 @@ use seed::{prelude::*, *};
 use seed_hooks::*;
 
 use crate::{
-    messages::Msg,
-    state::{entities::Card, routing::Route, Model},
+    messages::{
+        cards::{CardsMsg, DeleteCardPayload},
+        Msg,
+    },
+    state::{entities::Card, Model},
     BASE_URI,
 };
 
@@ -22,6 +25,8 @@ pub fn view(model: &Model, card_id: usize) -> Node<Msg> {
 }
 
 fn card_view(card: &Card) -> Node<Msg> {
+    let card_id = card.id;
+
     div![
         label!["Front: ", strong![card.front.to_owned()]],
         br![],
@@ -40,6 +45,14 @@ fn card_view(card: &Card) -> Node<Msg> {
         card.link
             .as_ref()
             .map(|link| label!["Link: ", a![attrs! { At::Href => link }, link.as_str()]])
-            .unwrap_or(div![])
+            .unwrap_or(div![]),
+        br![],
+        br![],
+        button![
+            "Delete",
+            ev(Ev::Click, move |_| Msg::Cards(CardsMsg::DeleteCard(
+                DeleteCardPayload { card_id }
+            )))
+        ]
     ]
 }

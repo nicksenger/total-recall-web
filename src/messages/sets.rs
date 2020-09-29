@@ -33,7 +33,9 @@ pub struct GetSetsSuccessPayload {
 }
 
 pub struct GotoAddSetPayload {
-    pub cards: Vec<Card>,
+    pub username: String,
+    pub deck_id: usize,
+    pub cards: Vec<usize>,
 }
 
 pub struct ViewSetDetailsPayload {

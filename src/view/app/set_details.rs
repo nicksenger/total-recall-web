@@ -2,8 +2,11 @@ use seed::{prelude::*, *};
 use seed_hooks::*;
 
 use crate::{
-    messages::Msg,
-    state::{entities::Set, routing::Route, Model},
+    messages::{
+        sets::{DeleteSetPayload, SetsMsg},
+        Msg,
+    },
+    state::{entities::Set, Model},
 };
 
 #[topo::nested]
@@ -21,5 +24,17 @@ pub fn view(model: &Model, set_id: usize) -> Node<Msg> {
 }
 
 fn set_view(set: &Set) -> Node<Msg> {
-    div![label!["Name: ", strong![set.name.to_owned()]]]
+    let set_id = set.id;
+
+    div![
+        label!["Name: ", strong![set.name.to_owned()]],
+        br![],
+        br![],
+        button![
+            "Delete",
+            ev(Ev::Click, move |_| Msg::Sets(SetsMsg::DeleteSet(
+                DeleteSetPayload { set_id }
+            )))
+        ]
+    ]
 }
