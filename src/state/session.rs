@@ -1,6 +1,7 @@
 use std::collections::VecDeque;
 
 use rand::prelude::*;
+use seed::prelude::*;
 
 use super::entities::Card;
 use crate::messages::{
@@ -53,19 +54,20 @@ pub fn update(action: &Msg, model: &mut SessionModel) {
 
         Msg::Session(SessionMsg::RateCardSuccess(payload)) => {
             model.loading = false;
+            model.status = SessionStatus::Prompt;
+            let len = model.review_queue.len();
             if let Some(card) = model.rate_queue.pop_front() {
                 match payload.rating {
                     ScoreValue::Zero | ScoreValue::One | ScoreValue::Two | ScoreValue::Three => {
-                        model.rate_queue.insert(
-                            thread_rng()
-                                .gen_range(model.rate_queue.len() / 2, model.rate_queue.len()),
+                        model.review_queue.insert(
+                            (unsafe { js_sys::Math::random() } * (len - len / 2) as f64) as usize
+                                + len / 2,
                             card,
                         );
                     }
                     _ => {}
                 }
             }
-            model.rate_queue.pop_front();
         }
 
         Msg::Session(SessionMsg::RateCardFailed(_)) => {
@@ -77,15 +79,15 @@ pub fn update(action: &Msg, model: &mut SessionModel) {
         }
 
         Msg::Session(SessionMsg::ReviewCard(payload)) => {
-            if let Some(card) = model.rate_queue.pop_front() {
+            let len = model.review_queue.len();
+            model.status = SessionStatus::Prompt;
+            if let Some(card) = model.review_queue.pop_front() {
                 match payload.rating {
-                    ScoreValue::Four | ScoreValue::Five => {
-                        model.review_queue.pop_front();
-                    }
+                    ScoreValue::Four | ScoreValue::Five => {}
                     _ => {
                         model.review_queue.insert(
-                            thread_rng()
-                                .gen_range(model.rate_queue.len() / 2, model.rate_queue.len()),
+                            (unsafe { js_sys::Math::random() } * (len - len / 2) as f64) as usize
+                                + len / 2,
                             card,
                         );
                     }

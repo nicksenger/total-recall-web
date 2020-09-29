@@ -43,18 +43,6 @@ pub struct GetCardsSuccessPayload {
     pub deck_id: usize,
 }
 
-pub struct ViewCardDetailsPayload {
-    pub card: Card,
-}
-
-pub struct ViewCardLinkPayload {
-    pub link: String,
-}
-
-pub struct ViewEditCardLinkPayload {
-    pub card: Card,
-}
-
 pub enum CardsMsg {
     AddCard(AddCardPayload),
     AddCardFetched(
@@ -85,7 +73,4 @@ pub enum CardsMsg {
     ),
     GetCardsFailed(ErrorPayload),
     GetCardsSuccess(GetCardsSuccessPayload),
-    ViewCardDetails(ViewCardDetailsPayload),
-    ViewCardLink(ViewCardLinkPayload),
-    ViewEditCardLink(ViewEditCardLinkPayload),
 }

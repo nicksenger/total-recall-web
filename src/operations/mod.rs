@@ -1,7 +1,6 @@
 use seed::prelude::*;
-use serde::{Deserialize, Serialize};
 
-use crate::{messages::Msg, state::Model, BASE_URI};
+use crate::{messages::Msg, state::Model};
 
 pub mod authentication;
 pub mod cards;

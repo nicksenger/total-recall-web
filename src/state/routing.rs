@@ -2,7 +2,7 @@ use std::{convert::TryFrom, fmt};
 
 use seed::prelude::*;
 
-use crate::messages::{routing::RoutingMessage, Msg};
+use crate::messages::{routing::RoutingMsg, Msg};
 
 #[derive(Clone, Debug)]
 pub enum Route {
@@ -18,6 +18,7 @@ pub enum Route {
     AddDeck(String),
     AddCard(String, usize),
     AddSet(String, usize),
+    Study,
     NotFound,
 }
 
@@ -71,6 +72,7 @@ impl Route {
                 format!("{}", deck_id),
                 "add-set".to_owned(),
             ],
+            Route::Study => vec!["study".to_owned()],
             Route::NotFound => vec![],
         }
     }
@@ -131,6 +133,7 @@ impl From<&Route> for seed::Url {
                 .add_path_part("decks")
                 .add_path_part(format!("{}", deck_id))
                 .add_path_part("add-set"),
+            Route::Study => seed::Url::new().add_path_part("study"),
             Route::NotFound => seed::Url::new(),
         }
     }
@@ -145,6 +148,7 @@ impl TryFrom<Url> for Route {
             None | Some("") => Ok(Route::Home),
             Some("login") => Ok(Route::Login),
             Some("register") => Ok(Route::Register),
+            Some("study") => Ok(Route::Study),
             Some("cards") => match path.next().as_ref().map(|s| s.as_str()) {
                 Some(id) => id
                     .parse::<usize>()
@@ -201,7 +205,7 @@ impl RoutingModel {
 
 pub fn update(action: &Msg, model: &mut RoutingModel) {
     match action {
-        Msg::Routing(RoutingMessage::Navigate(r)) => {
+        Msg::Routing(RoutingMsg::Navigate(r)) => {
             model.route = r.clone();
         }
 

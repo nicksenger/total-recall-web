@@ -5,7 +5,7 @@ use crate::{
     state::{routing::Route, Model},
 };
 
-pub fn view(mode: &Model) -> Node<Msg> {
+pub fn view(_model: &Model) -> Node<Msg> {
     div![
     p![
       "Total Recall is a spaced-repetition flashcard application designed to enable efficient study of foreign language vocabulary. ",

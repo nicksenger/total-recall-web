@@ -1,9 +1,9 @@
 use std::convert::TryFrom;
 
-use seed::{prelude::*, *};
+use seed::prelude::*;
 
 use crate::{
-    messages::{routing::RoutingMessage, Msg},
+    messages::{routing::RoutingMsg, Msg},
     state::routing::Route,
 };
 
@@ -23,7 +23,7 @@ pub fn start() {
 fn init(url: Url, orders: &mut impl Orders<messages::Msg>) -> state::Model {
     orders
         .subscribe(|subs::UrlChanged(url)| {
-            Msg::Routing(RoutingMessage::Navigate(
+            Msg::Routing(RoutingMsg::Navigate(
                 Route::try_from(url).unwrap_or(Route::NotFound),
             ))
         })

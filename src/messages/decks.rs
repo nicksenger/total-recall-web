@@ -36,14 +36,6 @@ pub struct GetLanguagesSuccessPayload {
     pub languages: Vec<Language>,
 }
 
-pub struct ViewDeckDetailsPayload {
-    pub deck: Deck,
-}
-
-pub struct ViewDeckItemsPayload {
-    pub deck: Deck,
-}
-
 pub enum DecksMsg {
     AddDeck(AddDeckPayload),
     AddDeckFetched(
@@ -70,6 +62,4 @@ pub enum DecksMsg {
     GetLanguagesFetched(fetch::Result<Response<decks::language_list::ResponseData>>),
     GetLanguagesFailed(ErrorPayload),
     GetLanguagesSuccess(GetLanguagesSuccessPayload),
-    ViewDeckDetails(ViewDeckDetailsPayload),
-    ViewDeckItems(ViewDeckItemsPayload),
 }

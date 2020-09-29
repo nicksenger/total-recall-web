@@ -4,7 +4,7 @@ use seed::{prelude::*, *};
 use seed_hooks::*;
 
 use crate::{
-    messages::{Msg, sets::{SetsMsg, GotoAddSetPayload}},
+    messages::Msg,
     state::{routing::Route, Model},
 };
 
@@ -40,11 +40,13 @@ pub fn view(model: &Model, username: &str, deck_id: usize) -> Node<Msg> {
                     li![
                         input![
                             ev(Ev::Change, move |_| {
-                                if selected_sets.get().contains(&id) {
-                                    selected_sets.get().remove(&id);
-                                } else {
-                                    selected_sets.get().insert(id);
-                                }
+                                let mut s = selected_sets.get();
+                                    if s.contains(&id) {
+                                        s.remove(&id);
+                                    } else {
+                                        s.insert(id);
+                                    }
+                                    selected_sets.set(s);
                             }),
                             attrs! { At::Type => "checkbox" },
                             if selected_sets.get().contains(&id) {

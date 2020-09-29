@@ -6,10 +6,11 @@ use seed_hooks::*;
 
 use crate::{
     messages::{
+        session::{SessionMsg, StudyPayload},
         sets::{GotoAddSetPayload, SetsMsg},
         Msg,
     },
-    state::{routing::Route, Model},
+    state::{entities::Card, routing::Route, Model},
 };
 
 #[topo::nested]
@@ -28,6 +29,13 @@ pub fn view(model: &Model, username: &str, deck_id: usize) -> Node<Msg> {
         .map(|v| v.len())
         .unwrap_or(0);
     let un = username.to_owned();
+    let session_cards = selected_cards
+        .get()
+        .iter()
+        .filter(|id| model.entities.cards.contains_key(id))
+        .map(|id| model.entities.cards.get(id).unwrap())
+        .cloned()
+        .collect::<Vec<Card>>();
 
     div![
         h3![format!(
@@ -57,11 +65,13 @@ pub fn view(model: &Model, username: &str, deck_id: usize) -> Node<Msg> {
                         li![
                             input![
                                 ev(Ev::Change, move |_| {
-                                    if selected_cards.get().contains(&id) {
-                                        selected_cards.get().remove(&id);
+                                    let mut s = selected_cards.get();
+                                    if s.contains(&id) {
+                                        s.remove(&id);
                                     } else {
-                                        selected_cards.get().insert(id);
+                                        s.insert(id);
                                     }
+                                    selected_cards.set(s);
                                 }),
                                 attrs! { At::Type => "checkbox" },
                                 if selected_cards.get().contains(&id) {
@@ -79,6 +89,7 @@ pub fn view(model: &Model, username: &str, deck_id: usize) -> Node<Msg> {
                     .unwrap_or(div![])))
             .unwrap()],
         br![],
+        p![format!("{} cards selected.", selected_cards.get().len())],
         p![format!(
             "Showing cards {} through {} of {}",
             deck_length.min(page_size.get() * page.get() + 1),
@@ -124,6 +135,20 @@ pub fn view(model: &Model, username: &str, deck_id: usize) -> Node<Msg> {
         a![
             "View sets",
             attrs! { At::Href => Route::DeckSets(username.to_owned(), deck_id) }
+        ],
+        br![],
+        button![
+            "Study",
+            ev(Ev::Click, |_| Msg::Session(SessionMsg::Study(
+                StudyPayload {
+                    cards: session_cards
+                }
+            ))),
+            if selected_cards.get().is_empty() {
+                attrs! { At::Disabled => true }
+            } else {
+                attrs! {}
+            }
         ]
     ]
 }

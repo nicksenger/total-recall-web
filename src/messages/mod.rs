@@ -13,7 +13,7 @@ pub enum Msg {
     Authentication(authentication::AuthMsg),
     Cards(cards::CardsMsg),
     Decks(decks::DecksMsg),
-    Routing(routing::RoutingMessage),
+    Routing(routing::RoutingMsg),
     Session(session::SessionMsg),
     Sets(sets::SetsMsg),
 }

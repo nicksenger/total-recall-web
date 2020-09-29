@@ -3,7 +3,7 @@ use seed::prelude::fetch;
 
 use super::ErrorPayload;
 use crate::operations::sets;
-use crate::state::entities::{Card, Set};
+use crate::state::entities::Set;
 
 pub struct AddSetPayload {
     pub deck_id: usize,
@@ -38,10 +38,6 @@ pub struct GotoAddSetPayload {
     pub cards: Vec<usize>,
 }
 
-pub struct ViewSetDetailsPayload {
-    pub set: Set,
-}
-
 pub enum SetsMsg {
     AddSet(AddSetPayload),
     AddSetFetched(
@@ -65,5 +61,4 @@ pub enum SetsMsg {
     GetSetsFailed(ErrorPayload),
     GetSetsSuccess(GetSetsSuccessPayload),
     GotoAddSet(GotoAddSetPayload),
-    ViewSetDetails(ViewSetDetailsPayload),
 }

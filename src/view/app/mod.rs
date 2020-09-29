@@ -14,6 +14,7 @@ mod deck_details;
 mod deck_sets;
 mod decks;
 mod set_details;
+mod study;
 
 pub fn view(model: &Model) -> Node<Msg> {
     match &model.routing.route {
@@ -26,6 +27,7 @@ pub fn view(model: &Model) -> Node<Msg> {
         Route::DeckDetails(_username, deck_id) => deck_details::view(&model, *deck_id),
         Route::AddCard(username, deck_id) => add_card::view(&model, username.as_str(), *deck_id),
         Route::AddSet(username, deck_id) => add_set::view(&model, username.as_str(), *deck_id),
+        Route::Study => study::view(&model),
         _ => h3!["Invalid route."],
     }
 }
