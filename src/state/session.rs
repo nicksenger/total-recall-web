@@ -38,7 +38,6 @@ impl SessionModel {
     }
 }
 
-#[allow(unused_unsafe)]
 pub fn update(action: &Msg, model: &mut SessionModel) {
     match action {
         Msg::Session(SessionMsg::Study(payload)) => {
@@ -61,15 +60,10 @@ pub fn update(action: &Msg, model: &mut SessionModel) {
         Msg::Session(SessionMsg::RateCardSuccess(payload)) => {
             model.loading = false;
             model.status = SessionStatus::Prompt;
-            let len = model.review_queue.len();
             if let Some(card) = model.rate_queue.pop_front() {
                 match payload.rating {
                     ScoreValue::Zero | ScoreValue::One | ScoreValue::Two | ScoreValue::Three => {
-                        model.review_queue.insert(
-                            (unsafe { js_sys::Math::random() } * (len - len / 2) as f64) as usize
-                                + len / 2,
-                            card,
-                        );
+                        model.review_queue.push_back(card);
                     }
                     _ => {}
                 }
@@ -85,17 +79,15 @@ pub fn update(action: &Msg, model: &mut SessionModel) {
         }
 
         Msg::Session(SessionMsg::ReviewCard(payload)) => {
-            let len = model.review_queue.len();
             model.status = SessionStatus::Prompt;
+            let len = model.review_queue.len();
             if let Some(card) = model.review_queue.pop_front() {
                 match payload.rating {
                     ScoreValue::Four | ScoreValue::Five => {}
                     _ => {
-                        model.review_queue.insert(
-                            (unsafe { js_sys::Math::random() } * (len - len / 2) as f64) as usize
-                                + len / 2,
-                            card,
-                        );
+                        model
+                            .review_queue
+                            .insert(model.rng.gen_range(len / 2, len), card);
                     }
                 }
             }
