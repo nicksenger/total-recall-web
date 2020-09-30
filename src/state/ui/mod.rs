@@ -26,20 +26,20 @@ pub struct UIModel {
 
 impl UIModel {
     pub fn new() -> Self {
-      Self {
-        add_card_screen: add_card_screen::AddCardScreenModel::new(),
-        add_deck_screen: add_deck_screen::AddDeckScreenModel::new(),
-        add_set_screen: add_set_screen::AddSetScreenModel::new(),
-        card_details_screen: card_details_screen::CardDetailsScreenModel::new(),
-        cards_screen: cards_screen::CardsScreenModel::new(),
-        deck_details_screen: deck_details_screen::DeckDetailsScreenModel::new(),
-        decks_screen: decks_screen::DecksScreenModel::new(),
-        register_screen: register_screen::RegisterScreenModel::new(),
-        sets_screen: sets_screen::SetsScreenModel::new(),
-        set_details_screen: set_details_screen::SetDetailsScreenModel::new(),
-      }
+        Self {
+            add_card_screen: add_card_screen::AddCardScreenModel::new(),
+            add_deck_screen: add_deck_screen::AddDeckScreenModel::new(),
+            add_set_screen: add_set_screen::AddSetScreenModel::new(),
+            card_details_screen: card_details_screen::CardDetailsScreenModel::new(),
+            cards_screen: cards_screen::CardsScreenModel::new(),
+            deck_details_screen: deck_details_screen::DeckDetailsScreenModel::new(),
+            decks_screen: decks_screen::DecksScreenModel::new(),
+            register_screen: register_screen::RegisterScreenModel::new(),
+            sets_screen: sets_screen::SetsScreenModel::new(),
+            set_details_screen: set_details_screen::SetDetailsScreenModel::new(),
+        }
     }
-  }
+}
 
 pub fn update(action: &Msg, model: &mut UIModel) {
     add_card_screen::update(action, &mut model.add_card_screen);

@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use seed::{prelude::*, browser::web_storage::WebStorageError};
+use seed::{browser::web_storage::WebStorageError, prelude::*};
 use serde::{Deserialize, Serialize};
 
 use crate::messages::{

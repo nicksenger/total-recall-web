@@ -68,10 +68,10 @@ pub fn operate(msg: &Msg, model: &Model, orders: &mut impl Orders<Msg>) {
             let password = payload.password.clone();
             orders.perform_cmd(async move {
                 Msg::Authentication(AuthMsg::RegistrationFetched(
-                    send_graphql_request(&Register::build_query(register::Variables {
-                        username,
-                        password,
-                    }), token)
+                    send_graphql_request(
+                        &Register::build_query(register::Variables { username, password }),
+                        token,
+                    )
                     .await,
                 ))
             });

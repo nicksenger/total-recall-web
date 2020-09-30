@@ -14,17 +14,13 @@ impl AddSetScreenModel {
     }
 }
 
-pub fn update(
-    action: &Msg,
-    model: &mut AddSetScreenModel,
-) {
+pub fn update(action: &Msg, model: &mut AddSetScreenModel) {
     match action {
         Msg::Sets(SetsMsg::AddSet(_)) => {
             model.loading = true;
         }
 
-        Msg::Sets(SetsMsg::AddSetSuccess(_))
-        | Msg::Sets(SetsMsg::AddSetFailed(_)) => {
+        Msg::Sets(SetsMsg::AddSetSuccess(_)) | Msg::Sets(SetsMsg::AddSetFailed(_)) => {
             model.loading = false;
         }
 

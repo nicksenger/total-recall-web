@@ -43,12 +43,15 @@ pub fn operate(msg: &Msg, model: &Model, orders: &mut impl Orders<Msg>) {
             orders.perform_cmd(async move {
                 Msg::Cards(CardsMsg::AddCardFetched(
                     deck_id,
-                    send_graphql_request(&CreateCard::build_query(create_card::Variables {
-                        deck_id: deck_id as i64,
-                        back,
-                        front,
-                        link,
-                    }), token)
+                    send_graphql_request(
+                        &CreateCard::build_query(create_card::Variables {
+                            deck_id: deck_id as i64,
+                            back,
+                            front,
+                            link,
+                        }),
+                        token,
+                    )
                     .await,
                 ))
             });
@@ -78,9 +81,12 @@ pub fn operate(msg: &Msg, model: &Model, orders: &mut impl Orders<Msg>) {
             orders.perform_cmd(async move {
                 Msg::Cards(CardsMsg::GetCardsFetched(
                     deck_id,
-                    send_graphql_request(&DeckCards::build_query(deck_cards::Variables {
-                        deck_id: deck_id as i64,
-                    }), token)
+                    send_graphql_request(
+                        &DeckCards::build_query(deck_cards::Variables {
+                            deck_id: deck_id as i64,
+                        }),
+                        token,
+                    )
                     .await,
                 ))
             });
@@ -151,10 +157,13 @@ pub fn operate(msg: &Msg, model: &Model, orders: &mut impl Orders<Msg>) {
                 Msg::Cards(CardsMsg::EditCardLinkFetched(
                     card_id,
                     link.clone(),
-                    send_graphql_request(&EditCardLink::build_query(edit_card_link::Variables {
-                        card_id: card_id as i64,
-                        link,
-                    }), token)
+                    send_graphql_request(
+                        &EditCardLink::build_query(edit_card_link::Variables {
+                            card_id: card_id as i64,
+                            link,
+                        }),
+                        token,
+                    )
                     .await,
                 ))
             });
@@ -188,9 +197,12 @@ pub fn operate(msg: &Msg, model: &Model, orders: &mut impl Orders<Msg>) {
             orders.perform_cmd(async move {
                 Msg::Cards(CardsMsg::DeleteCardFetched(
                     card_id,
-                    send_graphql_request(&DeleteCard::build_query(delete_card::Variables {
-                        card_id: card_id as i64,
-                    }), token)
+                    send_graphql_request(
+                        &DeleteCard::build_query(delete_card::Variables {
+                            card_id: card_id as i64,
+                        }),
+                        token,
+                    )
                     .await,
                 ))
             });

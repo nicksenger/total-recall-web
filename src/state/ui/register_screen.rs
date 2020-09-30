@@ -10,10 +10,7 @@ impl RegisterScreenModel {
     }
 }
 
-pub fn update(
-    action: &Msg,
-    model: &mut RegisterScreenModel,
-) {
+pub fn update(action: &Msg, model: &mut RegisterScreenModel) {
     match action {
         Msg::Authentication(AuthMsg::Register(_)) => {
             model.loading = true;

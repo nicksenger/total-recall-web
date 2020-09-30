@@ -41,12 +41,12 @@ pub fn view(model: &Model, username: &str, deck_id: usize) -> Node<Msg> {
                         input![
                             ev(Ev::Change, move |_| {
                                 let mut s = selected_sets.get();
-                                    if s.contains(&id) {
-                                        s.remove(&id);
-                                    } else {
-                                        s.insert(id);
-                                    }
-                                    selected_sets.set(s);
+                                if s.contains(&id) {
+                                    s.remove(&id);
+                                } else {
+                                    s.insert(id);
+                                }
+                                selected_sets.set(s);
                             }),
                             attrs! { At::Type => "checkbox" },
                             if selected_sets.get().contains(&id) {

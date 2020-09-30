@@ -10,17 +10,13 @@ impl AddCardScreenModel {
     }
 }
 
-pub fn update(
-    action: &Msg,
-    model: &mut AddCardScreenModel,
-) {
+pub fn update(action: &Msg, model: &mut AddCardScreenModel) {
     match action {
         Msg::Cards(CardsMsg::AddCard(_)) => {
             model.loading = true;
         }
 
-        Msg::Cards(CardsMsg::AddCardSuccess(_))
-        | Msg::Cards(CardsMsg::AddCardFailed(_)) => {
+        Msg::Cards(CardsMsg::AddCardSuccess(_)) | Msg::Cards(CardsMsg::AddCardFailed(_)) => {
             model.loading = false;
         }
 

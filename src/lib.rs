@@ -3,10 +3,11 @@ use std::convert::TryFrom;
 use seed::prelude::*;
 
 use crate::{
-    messages::{routing::RoutingMsg, cache::CacheMsg,Msg},
+    messages::{cache::CacheMsg, routing::RoutingMsg, Msg},
     state::routing::Route,
 };
 
+mod components;
 mod messages;
 mod operations;
 mod state;

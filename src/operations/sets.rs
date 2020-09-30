@@ -41,11 +41,14 @@ pub fn operate(msg: &Msg, model: &Model, orders: &mut impl Orders<Msg>) {
             orders.perform_cmd(async move {
                 Msg::Sets(SetsMsg::AddSetFetched(
                     deck_id,
-                    send_graphql_request(&CreateSet::build_query(create_set::Variables {
-                        deck_id: deck_id as i64,
-                        card_ids,
-                        name,
-                    }), token)
+                    send_graphql_request(
+                        &CreateSet::build_query(create_set::Variables {
+                            deck_id: deck_id as i64,
+                            card_ids,
+                            name,
+                        }),
+                        token,
+                    )
                     .await,
                 ))
             });
@@ -75,9 +78,12 @@ pub fn operate(msg: &Msg, model: &Model, orders: &mut impl Orders<Msg>) {
             orders.perform_cmd(async move {
                 Msg::Sets(SetsMsg::GetSetsFetched(
                     deck_id,
-                    send_graphql_request(&UserSets::build_query(user_sets::Variables {
-                        deck_id: deck_id as i64,
-                    }), token)
+                    send_graphql_request(
+                        &UserSets::build_query(user_sets::Variables {
+                            deck_id: deck_id as i64,
+                        }),
+                        token,
+                    )
                     .await,
                 ))
             });
@@ -122,9 +128,12 @@ pub fn operate(msg: &Msg, model: &Model, orders: &mut impl Orders<Msg>) {
             orders.perform_cmd(async move {
                 Msg::Sets(SetsMsg::DeleteSetFetched(
                     set_id,
-                    send_graphql_request(&DeleteSet::build_query(delete_set::Variables {
-                        set_id: set_id as i64,
-                    }), token)
+                    send_graphql_request(
+                        &DeleteSet::build_query(delete_set::Variables {
+                            set_id: set_id as i64,
+                        }),
+                        token,
+                    )
                     .await,
                 ))
             });

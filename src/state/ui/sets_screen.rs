@@ -14,10 +14,7 @@ impl SetsScreenModel {
     }
 }
 
-pub fn update(
-    action: &Msg,
-    model: &mut SetsScreenModel,
-) {
+pub fn update(action: &Msg, model: &mut SetsScreenModel) {
     match action {
         Msg::Sets(SetsMsg::GetSets(_)) => {
             model.loading = true;

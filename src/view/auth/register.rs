@@ -45,6 +45,9 @@ pub fn view(model: &Model) -> Node<Msg> {
         ],
         br![],
         br![],
-        p!["Already have an account? ", a!["Login", attrs! { At::Href => Route::Login }]]
+        p![
+            "Already have an account? ",
+            a!["Login", attrs! { At::Href => Route::Login }]
+        ]
     ]
 }

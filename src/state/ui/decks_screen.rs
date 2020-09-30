@@ -14,10 +14,7 @@ impl DecksScreenModel {
     }
 }
 
-pub fn update(
-    action: &Msg,
-    model: &mut DecksScreenModel,
-) {
+pub fn update(action: &Msg, model: &mut DecksScreenModel) {
     match action {
         Msg::Decks(DecksMsg::GetDecks(_)) => {
             model.loading = true;

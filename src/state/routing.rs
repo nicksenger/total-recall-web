@@ -19,6 +19,7 @@ pub enum Route {
     AddCard(String, usize),
     AddSet(String, usize),
     Study,
+    Manual,
     NotFound,
 }
 
@@ -73,6 +74,7 @@ impl Route {
                 "add-set".to_owned(),
             ],
             Route::Study => vec!["study".to_owned()],
+            Route::Manual => vec!["manual".to_owned()],
             Route::NotFound => vec![],
         }
     }
@@ -134,6 +136,7 @@ impl From<&Route> for seed::Url {
                 .add_path_part(format!("{}", deck_id))
                 .add_path_part("add-set"),
             Route::Study => seed::Url::new().add_path_part("study"),
+            Route::Manual => seed::Url::new().add_path_part("manual"),
             Route::NotFound => seed::Url::new(),
         }
     }
@@ -149,6 +152,7 @@ impl TryFrom<Url> for Route {
             Some("login") => Ok(Route::Login),
             Some("register") => Ok(Route::Register),
             Some("study") => Ok(Route::Study),
+            Some("manual") => Ok(Route::Manual),
             Some("cards") => match path.next().as_ref().map(|s| s.as_str()) {
                 Some(id) => id
                     .parse::<usize>()
