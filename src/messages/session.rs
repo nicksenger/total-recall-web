@@ -1,11 +1,12 @@
 use graphql_client::Response;
 use seed::prelude::fetch;
+use serde::{Deserialize, Serialize};
 
 use super::ErrorPayload;
 use crate::operations::session;
 use crate::state::entities::Card;
 
-#[derive(Clone)]
+#[derive(Clone, Deserialize, Serialize)]
 pub enum ScoreValue {
     Zero,
     One,

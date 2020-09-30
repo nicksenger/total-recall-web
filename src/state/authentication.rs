@@ -1,4 +1,6 @@
-use crate::messages::{authentication::AuthMsg, Msg};
+use seed::{browser::web_storage::WebStorageError, prelude::*};
+
+use crate::messages::{authentication::AuthMsg, cache::CacheMsg, Msg};
 
 pub struct AuthenticationModel {
     pub loading: bool,
@@ -37,6 +39,18 @@ pub fn update(action: &Msg, model: &mut AuthenticationModel) {
         Msg::Authentication(AuthMsg::Logout) => {
             model.token = None;
             model.username = None;
+        }
+
+        Msg::Cache(CacheMsg::Hydrate) => {
+            let username_result: Result<String, WebStorageError> = LocalStorage::get("username");
+            if let Ok(username) = username_result {
+                model.username = Some(username);
+            }
+
+            let token_result: Result<String, WebStorageError> = LocalStorage::get("token");
+            if let Ok(token) = token_result {
+                model.token = Some(token);
+            }
         }
 
         _ => {}

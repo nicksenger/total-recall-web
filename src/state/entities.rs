@@ -1,6 +1,10 @@
 use std::collections::HashMap;
 
+use seed::{prelude::*, browser::web_storage::WebStorageError};
+use serde::{Deserialize, Serialize};
+
 use crate::messages::{
+    cache::CacheMsg,
     cards::CardsMsg,
     decks::DecksMsg,
     session::{ScoreValue, SessionMsg},
@@ -26,7 +30,7 @@ pub struct Deck {
     pub owner: String,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Deserialize, Serialize)]
 pub struct Card {
     pub id: usize,
     pub created: u128,
@@ -142,6 +146,13 @@ pub fn update(msg: &Msg, model: &mut EntitiesModel) {
             payload.languages.iter().cloned().for_each(|l| {
                 model.languages.insert(l.id, l);
             });
+        }
+
+        Msg::Cache(CacheMsg::Hydrate) => {
+            let cards: Result<HashMap<usize, Card>, WebStorageError> = LocalStorage::get("cards");
+            if let Ok(cards) = cards {
+                model.cards = cards;
+            }
         }
 
         _ => {}

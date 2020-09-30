@@ -48,6 +48,11 @@ fn study_card_view(card: &Card, status: &SessionStatus, is_review: bool) -> Node
                 br![],
                 img![attrs! { At::Src => format!("{}/{}", BASE_URI, card.image) }],
                 br![],
+                match &card.link {
+                    Some(link) => a!["Link", attrs! { At::Href => link }],
+                    _ => span![],
+                },
+                br![],
                 br![],
                 [
                     ScoreValue::Zero,

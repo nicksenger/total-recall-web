@@ -1,21 +1,25 @@
 use std::collections::VecDeque;
 
 use rand::prelude::*;
-use seed::prelude::*;
+use seed::{browser::web_storage::WebStorageError, prelude::*};
+use serde::{Deserialize, Serialize};
 
 use super::entities::Card;
 use crate::messages::{
+    cache::CacheMsg,
     session::{ScoreValue, SessionMsg},
     Msg,
 };
 use crate::utilities::super_memo::needs_review;
 
+#[derive(Deserialize, Serialize)]
 pub enum SessionStatus {
     Prompt,
     Score,
 }
 
 pub struct SessionModel {
+    pub rng: ThreadRng,
     pub loading: bool,
     pub rate_queue: VecDeque<Card>,
     pub review_queue: VecDeque<Card>,
@@ -25,6 +29,7 @@ pub struct SessionModel {
 impl SessionModel {
     pub fn new() -> Self {
         Self {
+            rng: thread_rng(),
             loading: false,
             rate_queue: VecDeque::new(),
             review_queue: VecDeque::new(),
@@ -33,6 +38,7 @@ impl SessionModel {
     }
 }
 
+#[allow(unused_unsafe)]
 pub fn update(action: &Msg, model: &mut SessionModel) {
     match action {
         Msg::Session(SessionMsg::Study(payload)) => {
@@ -42,7 +48,7 @@ pub fn update(action: &Msg, model: &mut SessionModel) {
                 .cloned()
                 .filter(|c| needs_review(c))
                 .collect();
-            cards.shuffle(&mut thread_rng());
+            cards.shuffle(&mut model.rng);
             model.rate_queue = cards.into_iter().collect();
             model.review_queue.retain(|_| false);
             model.status = SessionStatus::Prompt;
@@ -92,6 +98,26 @@ pub fn update(action: &Msg, model: &mut SessionModel) {
                         );
                     }
                 }
+            }
+        }
+
+        Msg::Cache(CacheMsg::Hydrate) => {
+            let rate_queue: Result<VecDeque<Card>, WebStorageError> =
+                LocalStorage::get("rate_queue");
+            let review_queue: Result<VecDeque<Card>, WebStorageError> =
+                LocalStorage::get("review_queue");
+            let status: Result<SessionStatus, WebStorageError> = LocalStorage::get("status");
+
+            if let Ok(q) = rate_queue {
+                model.rate_queue = q;
+            }
+
+            if let Ok(q) = review_queue {
+                model.review_queue = q;
+            }
+
+            if let Ok(status) = status {
+                model.status = status;
             }
         }
 

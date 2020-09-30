@@ -3,7 +3,7 @@ use std::convert::TryFrom;
 use seed::prelude::*;
 
 use crate::{
-    messages::{routing::RoutingMsg, Msg},
+    messages::{routing::RoutingMsg, cache::CacheMsg,Msg},
     state::routing::Route,
 };
 
@@ -21,6 +21,7 @@ pub fn start() {
 }
 
 fn init(url: Url, orders: &mut impl Orders<messages::Msg>) -> state::Model {
+    orders.send_msg(Msg::Cache(CacheMsg::Hydrate));
     orders
         .subscribe(|subs::UrlChanged(url)| {
             Msg::Routing(RoutingMsg::Navigate(
