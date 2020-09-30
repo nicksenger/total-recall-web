@@ -41,5 +41,4 @@ pub enum AuthMsg {
     RegistrationFetched(fetch::Result<Response<authentication::register::ResponseData>>),
     RegistrationFailed(ErrorPayload),
     RegistrationSuccess,
-    RetrieveAuthInfo,
 }
