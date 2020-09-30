@@ -4,6 +4,7 @@ use seed_hooks::*;
 use crate::{
     messages::{
         cards::{CardsMsg, DeleteCardPayload},
+        session::{PlayAudioPayload, SessionMsg},
         Msg,
     },
     state::{entities::Card, Model},
@@ -26,6 +27,7 @@ pub fn view(model: &Model, card_id: usize) -> Node<Msg> {
 
 fn card_view(card: &Card) -> Node<Msg> {
     let card_id = card.id;
+    let audio = card.audio.clone();
 
     div![
         label!["Front: ", strong![card.front.to_owned()]],
@@ -46,6 +48,13 @@ fn card_view(card: &Card) -> Node<Msg> {
             .as_ref()
             .map(|link| label!["Link: ", a![attrs! { At::Href => link }, link.as_str()]])
             .unwrap_or(div![]),
+        br![],
+        button![
+            "Play audio",
+            ev(Ev::Click, |_| Msg::Session(SessionMsg::PlayAudio(
+                PlayAudioPayload { uri: audio }
+            )))
+        ],
         br![],
         br![],
         button![

@@ -38,7 +38,12 @@ pub struct StudyPayload {
     pub cards: Vec<Card>,
 }
 
+pub struct PlayAudioPayload {
+    pub uri: String,
+}
+
 pub enum SessionMsg {
+    PlayAudio(PlayAudioPayload),
     RateCard(RateCardPayload),
     RateCardFetched(
         usize,
