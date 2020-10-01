@@ -34,7 +34,7 @@ pub fn app_frame(model: &Model, content: Vec<Node<Msg>>) -> Node<Msg> {
             ev(Ev::Click, move |_| menu_open.set(false))
         ],
         div![
-            s().border("1px solid var(--spectrum-global-color-gray-300)"),
+            s().border_bottom("1px solid var(--spectrum-global-color-gray-300)"),
             s().background_color("var(--spectrum-global-color-gray-50)"),
             s().display("none"),
             s().box_sizing("border-box"),
@@ -94,6 +94,12 @@ pub fn app_frame(model: &Model, content: Vec<Node<Msg>>) -> Node<Msg> {
                                     a![s().visibility("hidden")],
                                     ul![
                                         s().list_style("none"),
+                                        s().padding("5px 0"),
+                                        s().margin("0"),
+                                        s().display("flex"),
+                                        s().flex_wrap("wrap"),
+                                        s().font_size(px(11)),
+                                        s().color("#4B4B4B"),
                                         li![
                                             s().color("var(--spectrum-body-text-color, var(--spectrum-alias-text-color))"),
                                             "Copyright © 2020 Nick Senger. All rights reserved."

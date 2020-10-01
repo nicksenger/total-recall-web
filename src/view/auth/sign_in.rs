@@ -30,7 +30,37 @@ pub fn view(model: &Model) -> Node<Msg> {
     }
 
     div![
-        h3!["Login:"],
+        header![
+            attrs! { At::Class => "spectrum-CSSComponent-heading" },
+            h1![attrs! { At::Class => "spectrum-Heading spectrum-Heading--XXXL spectrum-Heading-serif" }, "Login"],
+        ],
+        form![
+            attrs! { At::Class => "spectrum-Form" },
+            div![
+                attrs! { At::Class => "spectrum-Form-item" },
+                label![
+                    attrs! {
+                        At::Class => "spectrum-Form-itemLabel spectrum-FieldLabel--left",
+                        At::For => "loginUsername-input"
+                    },
+                    "Username"
+                ],
+                div![
+                    attrs! { At::Class => "spectrum-Form-itemField" },
+                    div![
+                        attrs! { At::Class => "spectrum-Textfield" },
+                        input![
+                            attrs! {
+                                At::Class => "spectrum-Textfield-input",
+                                At::Placeholder => "Enter your username",
+                                At::Id => "loginUsername-input"
+                            }
+                        ]
+                    ],
+                ]
+            ],
+            
+        ],
         "Username:",
         input![
             attrs! { At::Value => username },

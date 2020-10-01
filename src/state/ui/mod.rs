@@ -1,4 +1,4 @@
-use crate::messages::Msg;
+use crate::messages::{Msg, cache::CacheMsg};
 
 mod add_card_screen;
 mod add_deck_screen;
@@ -12,6 +12,7 @@ mod set_details_screen;
 mod sets_screen;
 
 pub struct UIModel {
+    pub dark_theme: bool,
     pub add_card_screen: add_card_screen::AddCardScreenModel,
     pub add_deck_screen: add_deck_screen::AddDeckScreenModel,
     pub add_set_screen: add_set_screen::AddSetScreenModel,
@@ -27,6 +28,7 @@ pub struct UIModel {
 impl UIModel {
     pub fn new() -> Self {
         Self {
+            dark_theme: false,
             add_card_screen: add_card_screen::AddCardScreenModel::new(),
             add_deck_screen: add_deck_screen::AddDeckScreenModel::new(),
             add_set_screen: add_set_screen::AddSetScreenModel::new(),
@@ -41,15 +43,23 @@ impl UIModel {
     }
 }
 
-pub fn update(action: &Msg, model: &mut UIModel) {
-    add_card_screen::update(action, &mut model.add_card_screen);
-    add_deck_screen::update(action, &mut model.add_deck_screen);
-    add_set_screen::update(action, &mut model.add_set_screen);
-    card_details_screen::update(action, &mut model.card_details_screen);
-    cards_screen::update(action, &mut model.cards_screen);
-    deck_details_screen::update(action, &mut model.deck_details_screen);
-    decks_screen::update(action, &mut model.decks_screen);
-    register_screen::update(action, &mut model.register_screen);
-    sets_screen::update(action, &mut model.sets_screen);
-    set_details_screen::update(action, &mut model.set_details_screen);
+pub fn update(msg: &Msg, model: &mut UIModel) {
+    add_card_screen::update(msg, &mut model.add_card_screen);
+    add_deck_screen::update(msg, &mut model.add_deck_screen);
+    add_set_screen::update(msg, &mut model.add_set_screen);
+    card_details_screen::update(msg, &mut model.card_details_screen);
+    cards_screen::update(msg, &mut model.cards_screen);
+    deck_details_screen::update(msg, &mut model.deck_details_screen);
+    decks_screen::update(msg, &mut model.decks_screen);
+    register_screen::update(msg, &mut model.register_screen);
+    sets_screen::update(msg, &mut model.sets_screen);
+    set_details_screen::update(msg, &mut model.set_details_screen);
+
+    match msg {
+        Msg::Cache(CacheMsg::ToggleDarkTheme(dark)) => {
+            model.dark_theme = *dark;
+        }
+
+        _ => {}
+    }
 }

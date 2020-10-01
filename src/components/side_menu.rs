@@ -2,12 +2,13 @@ use seed::{prelude::*, *};
 use seed_style::{pc, px, *};
 
 use crate::{
-    messages::{authentication::AuthMsg, Msg},
+    messages::{authentication::AuthMsg, cache::CacheMsg, Msg},
     state::Model,
     Route, BASE_URI,
 };
 
 pub fn side_menu(model: &Model, menu_open: bool) -> Node<Msg> {
+    let dark = model.ui.dark_theme;
     div![
         s().min_height("100vh"),
         s().background_color("var(--spectrum-global-color-gray-75)"),
@@ -34,7 +35,10 @@ pub fn side_menu(model: &Model, menu_open: bool) -> Node<Msg> {
             s().align_items("center"),
             s().padding("var(--spectrum-global-dimension-size-350) var(--spectrum-global-dimension-size-300)"),
             s().text_decoration("none"),
-            img![attrs! { At::Src => format!("{}/icon.png", BASE_URI) }, s().height(px(32)), s().margin_right("var(--spectrum-global-dimension-size-200)")],
+            img![
+              attrs! { At::Src => format!("{}/icon.png", "http://localhost:8000") },
+              s().height(px(32)), s().margin_right("var(--spectrum-global-dimension-size-200)")
+            ],
             h2![
               s().color("var(--spectrum-heading-m-text-color, var(--spectrum-alias-heading-text-color))"),
               s().font_family("var(--spectrum-heading-m-text-font-family, var(--spectrum-alias-body-text-font-family))"),
@@ -46,13 +50,28 @@ pub fn side_menu(model: &Model, menu_open: bool) -> Node<Msg> {
               s().text_transform("var(--spectrum-heading-m-text-transform, none)"),
               s().margin_top("0"),
               s().margin_bottom("0"),
-              s().white_space("nowrap"),
               "Total Recall"
             ]
         ],
         div![
           s().padding("0 var(--spectrum-global-dimension-size-300) var(--spectrum-global-dimension-size-300) var(--spectrum-global-dimension-size-300)"),
-          hr![attrs! { At::Class => "spectrum-Divider spectrum-Divider--small" }],
+          s().width(px(200)),
+          hr![
+              attrs! { At::Class => "spectrum-Divider spectrum-Divider--small" },
+          ],
+          div![
+              attrs! { At::Class => "spectrum-Switch" },
+              input![
+                if model.ui.dark_theme {
+                  attrs! { At::Type => "checkbox", At::Class => "spectrum-Switch-input", At::Id => "theme-switch", At::Checked => "true" }
+                } else {
+                  attrs! { At::Type => "checkbox", At::Class => "spectrum-Switch-input" }
+                },
+                ev(Ev::Change, move |_| Msg::Cache(CacheMsg::ToggleDarkTheme(!dark)))
+              ],
+              span![ attrs! { At::Class => "spectrum-Switch-switch" } ],
+              label![ attrs! { At::Class => "spectrum-Switch-label", At::For => "theme-switch" }, if dark { "Dark" } else { "Light" }],
+          ],
         ],
         div![
           s().overflow_x("hidden"),
@@ -100,9 +119,6 @@ pub fn side_menu(model: &Model, menu_open: bool) -> Node<Msg> {
                   a![ attrs! { At::Class => "spectrum-SideNav-itemLink", At::Href => Route::Manual }, "User Manual"]
                 ],
                 li![
-                  attrs! {
-                    At::Href => Route::Home
-                  },
                   a![
                     attrs! {
                       At::Class => "spectrum-SideNav-itemLink",
