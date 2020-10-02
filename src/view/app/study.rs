@@ -13,7 +13,19 @@ use crate::{
 #[topo::nested]
 pub fn view(model: &Model) -> Node<Msg> {
     if model.authentication.token.is_none() {
-        p!["You must be logged in to study."]
+        div![
+            header![
+                attrs! { At::Class => "spectrum-CSSComponent-heading" },
+                h1![
+                    attrs! { At::Class => "spectrum-Heading spectrum-Heading--XXXL spectrum-Heading-serif" },
+                    "Unauthorized"
+                ],
+            ],
+            p![
+                "You must be logged in to study.",
+                attrs! { At::Class => "spectrum-Body spectrum-Body--M" }
+            ],
+        ]
     } else if model.session.loading {
         p!["loading..."]
     } else if let Some(card) = model.session.rate_queue.iter().next() {
@@ -21,7 +33,19 @@ pub fn view(model: &Model) -> Node<Msg> {
     } else if let Some(card) = model.session.review_queue.iter().next() {
         study_card_view(card, &model.session.status, true)
     } else {
-        p!["Nothing to study."]
+        div![
+            header![
+                attrs! { At::Class => "spectrum-CSSComponent-heading" },
+                h1![
+                    attrs! { At::Class => "spectrum-Heading spectrum-Heading--L spectrum-Heading-serif" },
+                    "No Cards"
+                ],
+            ],
+            p![
+                "There are currently no cards to study in the queue. You can add some from the cards page of any deck.",
+                attrs! { At::Class => "spectrum-Body spectrum-Body--M" }
+            ],
+        ]
     }
 }
 

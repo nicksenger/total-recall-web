@@ -71,6 +71,8 @@ pub fn app_frame(model: &Model, content: Vec<Node<Msg>>) -> Node<Msg> {
                         s().margin("var(--spectrum-global-dimension-size-500) auto"),
                         s().padding("0 var(--spectrum-global-dimension-size-700)"),
                         s().width("-webkit-fill-available"),
+                        s().media("@media screen and (max-width: 960px)").padding("0 var(--spectrum-global-dimension-size-250)"),
+                        s().media("@media screen and (max-width: 960px)").margin("var(--spectrum-global-dimension-size-100) auto"),
                         content
                     ],
                     div![

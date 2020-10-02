@@ -4,7 +4,7 @@ use seed_style::{pc, px, *};
 use crate::{
     messages::{authentication::AuthMsg, cache::CacheMsg, Msg},
     state::Model,
-    Route, BASE_URI,
+    Route,
 };
 
 pub fn side_menu(model: &Model, menu_open: bool) -> Node<Msg> {
