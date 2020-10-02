@@ -66,7 +66,7 @@ pub fn view(model: &Model) -> Node<Msg> {
                             username: username.get(),
                             password: password.get()
                         })),
-                        false
+                        username.get().len() == 0 || password.get().len() == 0
                     ),
                 ],
             ]
