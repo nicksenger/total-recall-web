@@ -87,26 +87,34 @@ pub fn operate(msg: &Msg, model: &Model, orders: &mut impl Orders<Msg>) {
             orders.send_msg(Msg::Routing(RoutingMsg::Push(Route::Study)));
         }
 
-        Msg::Routing(RoutingMsg::Navigate(Route::Decks(username))) => {
-            orders.send_msg(Msg::Decks(DecksMsg::GetDecks(GetDecksPayload {
-                username: username.clone(),
-            })));
-        }
+        Msg::Routing(RoutingMsg::Navigate(x)) => {
+            orders.send_msg(Msg::Routing(RoutingMsg::ModalOpen(false)));
 
-        Msg::Routing(RoutingMsg::Navigate(Route::DeckCards(_, deck_id))) => {
-            orders.send_msg(Msg::Cards(CardsMsg::GetCards(GetCardsPayload {
-                deck_id: *deck_id,
-            })));
-        }
+            match x {
+                Route::Decks(username) => {
+                    orders.send_msg(Msg::Decks(DecksMsg::GetDecks(GetDecksPayload {
+                        username: username.clone(),
+                    })));
+                }
 
-        Msg::Routing(RoutingMsg::Navigate(Route::DeckSets(_, deck_id))) => {
-            orders.send_msg(Msg::Sets(SetsMsg::GetSets(GetSetsPayload {
-                deck_id: *deck_id,
-            })));
-        }
+                Route::DeckCards(_, deck_id) => {
+                    orders.send_msg(Msg::Cards(CardsMsg::GetCards(GetCardsPayload {
+                        deck_id: *deck_id,
+                    })));
+                }
 
-        Msg::Routing(RoutingMsg::Navigate(Route::AddDeck(_))) => {
-            orders.send_msg(Msg::Decks(DecksMsg::GetLanguages));
+                Route::DeckSets(_, deck_id) => {
+                    orders.send_msg(Msg::Sets(SetsMsg::GetSets(GetSetsPayload {
+                        deck_id: *deck_id,
+                    })));
+                }
+
+                Route::AddDeck(_) => {
+                    orders.send_msg(Msg::Decks(DecksMsg::GetLanguages));
+                },
+
+                _ => {}
+            }
         }
 
         _ => {}

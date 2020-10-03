@@ -6,22 +6,21 @@ pub enum ButtonType {
     CTA,
     Primary,
     Secondary,
+    Warning,
 }
 
-pub fn button<F: Clone + 'static>(
+pub fn button<MsU: 'static>(
     text: &str,
     button_type: ButtonType,
-    on_click: F,
+    on_click: impl FnOnce(web_sys::Event) -> MsU + 'static + Clone,
     disabled: bool,
-) -> Node<Msg>
-where
-    F: FnOnce() -> Msg,
-{
-    let btn_class = match button_type {
-        ButtonType::CTA => "spectrum-Button spectrum-Button--cta",
-        ButtonType::Primary => "spectrum-Button spectrum-Button--primary",
-        ButtonType::Secondary => "spectrum-Button spectrum-Button--secondary",
-    };
+) -> Node<Msg> {
+    let btn_class = format!("spectrum-Button spectrum-ButtonGroup-item {}", match button_type {
+        ButtonType::CTA => "spectrum-Button--cta",
+        ButtonType::Primary => "spectrum-Button--primary",
+        ButtonType::Secondary => "spectrum-Button--secondary",
+        ButtonType::Warning => "spectrum-Button--warning",
+    });
     button![
         if disabled {
             attrs! { At::Class => btn_class, At::Disabled => "true" }
@@ -31,7 +30,7 @@ where
         span![attrs! { At::Class => "spectrum-Button-label" }, text],
         ev(Ev::Click, |ev| {
             ev.prevent_default();
-            on_click()
+            on_click(ev)
         })
     ]
 }

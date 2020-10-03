@@ -197,12 +197,14 @@ impl TryFrom<Url> for Route {
 
 pub struct RoutingModel {
     pub route: Route,
+    pub modal_open: bool,
 }
 
 impl RoutingModel {
     pub fn new(url: Url) -> Self {
         Self {
             route: Route::try_from(url).unwrap_or(Route::NotFound),
+            modal_open: false,
         }
     }
 }
@@ -211,6 +213,10 @@ pub fn update(action: &Msg, model: &mut RoutingModel) {
     match action {
         Msg::Routing(RoutingMsg::Navigate(r)) => {
             model.route = r.clone();
+        }
+
+        Msg::Routing(RoutingMsg::ModalOpen(x)) => {
+            model.modal_open = *x;
         }
 
         _ => {}

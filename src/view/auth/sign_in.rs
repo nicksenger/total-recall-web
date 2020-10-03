@@ -32,7 +32,7 @@ pub fn view(model: &Model) -> Node<Msg> {
                 button(
                     "Logout",
                     ButtonType::Secondary,
-                    move || Msg::Authentication(AuthMsg::Logout),
+                    move |_| Msg::Authentication(AuthMsg::Logout),
                     false,
                 ),
             ]
@@ -62,7 +62,7 @@ pub fn view(model: &Model) -> Node<Msg> {
                     button(
                         "Go!",
                         ButtonType::CTA,
-                        move || Msg::Authentication(AuthMsg::AttemptLogin(AttemptLoginPayload {
+                        move |_| Msg::Authentication(AuthMsg::AttemptLogin(AttemptLoginPayload {
                             username: username.get(),
                             password: password.get()
                         })),

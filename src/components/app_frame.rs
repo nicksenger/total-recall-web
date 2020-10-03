@@ -113,6 +113,11 @@ pub fn app_frame(model: &Model, content: Vec<Node<Msg>>) -> Node<Msg> {
                     ]
                 ]
             ]
+        ],
+        div![
+            attrs! {
+                At::Class => if model.routing.modal_open { "spectrum-Underlay is-open" } else { "spectrum-Underlay" }
+            }
         ]
     ]
 }

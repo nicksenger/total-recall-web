@@ -24,7 +24,7 @@ pub fn view(model: &Model) -> Node<Msg> {
         Route::CardDetails(card_id) => card_details::view(&model, *card_id),
         Route::SetDetails(set_id) => set_details::view(&model, *set_id),
         Route::AddDeck(username) => add_deck::view(&model, username.as_str()),
-        Route::DeckDetails(_username, deck_id) => deck_details::view(&model, *deck_id),
+        Route::DeckDetails(username, deck_id) => deck_details::view(&model, *deck_id, username.as_str()),
         Route::AddCard(username, deck_id) => add_card::view(&model, username.as_str(), *deck_id),
         Route::AddSet(username, deck_id) => add_set::view(&model, username.as_str(), *deck_id),
         Route::Study => study::view(&model),

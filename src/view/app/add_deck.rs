@@ -78,7 +78,7 @@ pub fn view(model: &Model, _username: &str) -> Node<Msg> {
                 button(
                     "Go!",
                     ButtonType::CTA,
-                    move || Msg::Decks(DecksMsg::AddDeck(AddDeckPayload {
+                    move |_| Msg::Decks(DecksMsg::AddDeck(AddDeckPayload {
                         language: selected_language.unwrap_or(0),
                         name: deck_name.get(),
                         username

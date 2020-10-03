@@ -3,7 +3,7 @@ use seed_hooks::*;
 use seed_style::{pc, *};
 
 use crate::{
-    components::{button, link, ButtonType},
+    components::{button, ButtonType},
     messages::{routing::RoutingMsg, Msg},
     state::{routing::Route, Model},
 };
@@ -34,7 +34,6 @@ pub fn view(model: &Model, username: &str) -> Node<Msg> {
                         attrs! { At::Class => "spectrum-Table-headCell" },
                         "Language"
                     ],
-                    th![attrs! { At::Class => "spectrum-Table-headCell" }, "Actions"]
                 ]
             ],
             tbody![
@@ -52,14 +51,6 @@ pub fn view(model: &Model, username: &str) -> Node<Msg> {
                             attrs! { At::Class => "spectrum-Table-cell" },
                             d.language.as_str()
                         ],
-                        td![
-                            attrs! { At::Class => "spectrum-Table-cell" },
-                            link(
-                                "view cards",
-                                format!("{}", Route::DeckCards(username.to_owned(), d.id)).as_str()
-                            ),
-                            ev(Ev::Click, |e| e.stop_propagation()),
-                        ],
                         ev(Ev::Click, move |_| Msg::Routing(RoutingMsg::Push(
                             Route::DeckDetails(un, id)
                         ))),
@@ -72,7 +63,7 @@ pub fn view(model: &Model, username: &str) -> Node<Msg> {
         button(
             "Add deck",
             ButtonType::Secondary,
-            || Msg::Routing(RoutingMsg::Push(Route::AddDeck(un))),
+            |_| Msg::Routing(RoutingMsg::Push(Route::AddDeck(un))),
             false
         )
     ]
