@@ -3,6 +3,7 @@ use std::collections::HashSet;
 use seed::virtual_dom::update_el::UpdateEl;
 use seed::{prelude::*, *};
 use seed_hooks::*;
+use seed_style::{pc, *};
 
 use crate::{
     components::*,
@@ -130,34 +131,21 @@ pub fn view(model: &Model, username: &str, deck_id: usize) -> Node<Msg> {
                 )
             ]
         ]),
-        pager(page.get(), deck_length / page_size.get() + 1, move |i| {
-            page.set(i)
-        }),
-        button![
-            "Prev",
-            ev(Ev::Click, move |_| page.set(page.get() - 1)),
-            if page.get() == 0 {
-                attrs! { At::Disabled => true }
-            } else {
-                attrs! {}
-            }
+        div![
+            s().display("flex"),
+            s().justify_content("center"),
+            pager(page.get(), deck_length / page_size.get() + 1, move |i| {
+                page.set(i)
+            }),
         ],
-        button![
-            "Next",
-            ev(Ev::Click, move |_| page.set(page.get() + 1)),
-            if page_size.get() * (page.get() + 1) >= deck_length {
-                attrs! { At::Disabled => true }
-            } else {
-                attrs! {}
-            }
+        div![
+            s().display("flex"),
+            s().justify_content("flex-end"),
+            button_link(
+                "Add Card",
+                ButtonType::CTA,
+                format!("{}", Route::AddCard(username.to_owned(), deck_id)).as_str()
+            ),
         ],
-        br![],
-        br![],
-        br![],
-        button_link(
-            "Add Card",
-            ButtonType::CTA,
-            format!("{}", Route::AddCard(username.to_owned(), deck_id)).as_str()
-        )
     ]
 }

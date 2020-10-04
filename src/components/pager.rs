@@ -26,18 +26,17 @@ pub fn pager(
             .take(3)
             .map(|i| {
                 let handler = on_page.clone();
-                button(
-                    format!("{}", i + 1).as_str(),
-                    ButtonType::Action,
-                    move |_| handler(i),
-                    false,
-                )
+                a![
+                    C!["spectrum-ActionButton", "spectrum-ActionButton--quiet", IF!(current_page == i => "is-selected")],
+                    span![format!("{}", i + 1)],
+                    ev(Ev::Click, move |_| handler(i))
+                ]
             }),
-        if current_page + 1 < pages {
+        if current_page + 3 < pages {
             let handler = on_page.clone();
             vec![
                 button("...", ButtonType::Action, |_| {}, true),
-                button(format!("{}", pages).as_str(), ButtonType::Action, move |_| handler(pages), false),
+                button(format!("{}", pages).as_str(), ButtonType::Action, move |_| handler(pages - 1), false),
             ]
         } else {
             vec![]
