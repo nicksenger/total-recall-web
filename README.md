@@ -1,6 +1,6 @@
 # Total Recall Web
 
-Rust WebAssembly application for Total Recall.
+Rust WebAssembly application for Total Recall. Deployed at https://trc.nsenger.com.
 
 ## Commands
 
