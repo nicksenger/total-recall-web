@@ -10,7 +10,7 @@ use crate::{
     messages::{
         cards::{AddCardPayload, CardsMsg},
         routing::RoutingMsg,
-        session::{SessionMsg, StudyPayload},
+        session::{SessionMsg, StudyPayload, ScoreValue},
         sets::{AddSetPayload, SetsMsg},
         Msg,
     },
@@ -180,7 +180,7 @@ pub fn view(model: &Model, _username: &str, deck_id: usize) -> Node<Msg> {
                         card.front.as_str(),
                         format!("{}", Route::CardDetails(c)).as_str(),
                     ),
-                    span![card.score.last().map(|d| "+").unwrap_or("-")],
+                    score_meter(card.score.last().unwrap_or(&ScoreValue::Zero))
                 ]
             },
             Some((

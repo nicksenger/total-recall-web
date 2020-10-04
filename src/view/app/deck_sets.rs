@@ -6,7 +6,7 @@ use seed_hooks::*;
 use crate::{
     components::*,
     messages::{
-        session::{SessionMsg, StudyPayload},
+        session::{SessionMsg, StudyPayload, ScoreValue},
         Msg,
     },
     state::{entities::Card, routing::Route, Model},
@@ -74,7 +74,26 @@ pub fn view(model: &Model, _username: &str, deck_id: usize) -> Node<Msg> {
                         set.name.as_str(),
                         format!("{}", Route::SetDetails(id)).as_str(),
                     ),
-                    span!["-"],
+                    score_meter(&match set.card_ids.iter().fold(0usize, |mut acc, cur| {
+                        if let Some(card) = &model.entities.cards.get(cur) {
+                            acc += match card.score.last() {
+                                Some(ScoreValue::One) => 1,
+                                Some(ScoreValue::Two) => 2,
+                                Some(ScoreValue::Three) => 3,
+                                Some(ScoreValue::Four) => 4,
+                                Some(ScoreValue::Five) => 5,
+                                _ => 0
+                            };
+                        }
+                        acc
+                    }) / set.card_ids.len() {
+                        1 => ScoreValue::One,
+                        2 => ScoreValue::Two,
+                        3 => ScoreValue::Three,
+                        4 => ScoreValue::Four,
+                        5 => ScoreValue::Five,
+                        _ => ScoreValue::Zero
+                    })
                 ]
             },
             Some((

@@ -19,7 +19,7 @@ pub fn view(_model: &Model) -> Node<Msg> {
         br![],
         br![],
         img![
-            attrs! { At::Src => "http://localhost:8000/banner.jpeg" },
+            attrs! { At::Src => format!("{}/banner.jpeg", BASE_URI) },
             s().width(pc(100)),
             s().border_radius(px(25)),
         ],
@@ -94,10 +94,7 @@ fn home_section(title: &str, description: Vec<&str>, links: Vec<Node<Msg>>) -> N
             .max_width("33.33333333%"),
         s().padding_right(px(16)),
         s().padding_left(px(16)),
-        h3![
-            C!["spectrum-Heading spectrum-Heading--S"],
-            title
-        ],
+        h3![C!["spectrum-Heading spectrum-Heading--S"], title],
         br![],
         div![
             p![C!["spectrum-Body--M"], description],

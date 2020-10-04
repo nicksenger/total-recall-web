@@ -38,7 +38,7 @@ pub fn table<T: 'static + Copy + Eq + Hash>(
                             let mut new_selected = selected.clone();
                             if cloned_items.iter().all(|id| selected.contains(id)) {
                                 cloned_items.iter().for_each(|id| {
-                                  new_selected.remove(id);
+                                    new_selected.remove(id);
                                 })
                             } else {
                                 new_selected.extend(cloned_items);
@@ -93,7 +93,15 @@ pub fn table<T: 'static + Copy + Eq + Hash>(
                     },
                     render_row(*x)
                         .into_iter()
-                        .map(|n| { div![s().flex("1"), C!["spectrum-Table-cell"], n] })
+                        .map(|n| {
+                            div![
+                                s().flex("1"),
+                                s().display("flex"),
+                                s().align_items("center"),
+                                C!["spectrum-Table-cell"],
+                                n
+                            ]
+                        })
                         .collect::<Vec<Node<Msg>>>(),
                 ]
             })

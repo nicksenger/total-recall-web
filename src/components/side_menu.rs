@@ -4,7 +4,7 @@ use seed_style::{pc, px, *};
 use crate::{
     messages::{authentication::AuthMsg, cache::CacheMsg, Msg},
     state::Model,
-    Route,
+    Route, BASE_URI,
 };
 
 pub fn side_menu(model: &Model, menu_open: bool) -> Node<Msg> {
@@ -36,7 +36,7 @@ pub fn side_menu(model: &Model, menu_open: bool) -> Node<Msg> {
             s().padding("var(--spectrum-global-dimension-size-350) var(--spectrum-global-dimension-size-300)"),
             s().text_decoration("none"),
             img![
-              attrs! { At::Src => format!("{}/icon.png", "http://localhost:8000") },
+              attrs! { At::Src => format!("{}/icon.png", BASE_URI) },
               s().height(px(32)), s().margin_right("var(--spectrum-global-dimension-size-200)")
             ],
             h2![

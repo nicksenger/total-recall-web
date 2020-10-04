@@ -7,6 +7,7 @@ mod form;
 mod icons;
 mod link;
 mod pager;
+mod score_meter;
 mod side_menu;
 mod table;
 
@@ -19,5 +20,6 @@ pub use form::*;
 pub use icons::*;
 pub use link::link;
 pub use pager::pager;
+pub use score_meter::score_meter;
 pub use side_menu::side_menu;
 pub use table::table;
