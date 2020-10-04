@@ -12,6 +12,7 @@ pub fn button_link(text: &str, button_type: ButtonType, href: &str) -> Node<Msg>
             ButtonType::Primary => "spectrum-Button--primary",
             ButtonType::Secondary => "spectrum-Button--secondary",
             ButtonType::Warning => "spectrum-Button--warning",
+            ButtonType::Action => "spectrum-ActionButton spectrum-ActionButton--quiet spectrum-ActionGroup-item"
         }
     );
     a![

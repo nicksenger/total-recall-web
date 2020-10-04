@@ -5,6 +5,7 @@ use seed::{prelude::*, *};
 use seed_hooks::*;
 
 use crate::{
+    components::*,
     messages::{
         session::{SessionMsg, StudyPayload},
         sets::{GotoAddSetPayload, SetsMsg},
@@ -20,14 +21,28 @@ pub fn view(model: &Model, username: &str, deck_id: usize) -> Node<Msg> {
     }
 
     let page = use_state(|| 0usize);
-    let page_size = use_state(|| 20usize);
+    let page_size = use_state(|| 10usize);
     let selected_cards = use_state(HashSet::<usize>::new);
-    let deck_length = (&model)
+    let deck_cards = (&model)
         .entities
         .deck_cards
         .get(&deck_id)
-        .map(|v| v.len())
-        .unwrap_or(0);
+        .map(|dc| {
+            dc.iter()
+                .map(|card_id| (&model).entities.cards.get(card_id))
+                .filter(|x| x.is_some())
+                .map(|c| c.unwrap().id)
+                .collect::<Vec<usize>>()
+        })
+        .unwrap_or(vec![]);
+    let page_cards = deck_cards
+        .iter()
+        .skip(page.get() * page_size.get())
+        .take(page_size.get())
+        .cloned()
+        .collect::<Vec<usize>>();
+
+    let deck_length = deck_cards.len();
     let un = username.to_owned();
     let session_cards = selected_cards
         .get()
@@ -38,64 +53,86 @@ pub fn view(model: &Model, username: &str, deck_id: usize) -> Node<Msg> {
         .collect::<Vec<Card>>();
 
     div![
-        h3![format!(
-            "{} cards:",
-            (&model)
-                .entities
-                .decks
-                .get(&deck_id)
-                .as_ref()
-                .map(|d| d.name.as_str())
-                .unwrap_or("unknown deck"),
-        )],
-        ul![(&model)
-            .entities
-            .deck_cards
-            .get(&deck_id)
-            .map(|dc| dc
-                .iter()
-                .skip(page.get() * page_size.get())
-                .take(page_size.get())
-                .map(|card_id| (&model)
-                    .entities
-                    .cards
-                    .get(card_id)
-                    .map(|c| {
-                        let id = c.id;
-                        li![
-                            input![
-                                ev(Ev::Change, move |_| {
-                                    let mut s = selected_cards.get();
-                                    if s.contains(&id) {
-                                        s.remove(&id);
-                                    } else {
-                                        s.insert(id);
-                                    }
-                                    selected_cards.set(s);
-                                }),
-                                attrs! { At::Type => "checkbox" },
-                                if selected_cards.get().contains(&id) {
-                                    attrs! { At::Checked => true }
-                                } else {
-                                    attrs! {}
-                                }
-                            ],
-                            a![
-                                c.front.to_owned(),
-                                attrs! { At::Href => Route::CardDetails(c.id) }
-                            ]
-                        ]
-                    })
-                    .unwrap_or(div![])))
-            .unwrap()],
-        br![],
-        p![format!("{} cards selected.", selected_cards.get().len())],
-        p![format!(
-            "Showing cards {} through {} of {}",
-            deck_length.min(page_size.get() * page.get() + 1),
-            deck_length.min(page_size.get() * (page.get() + 1)),
-            deck_length
-        )],
+        header![
+            attrs! { At::Class => "spectrum-CSSComponent-heading" },
+            h1![
+                attrs! { At::Class => "spectrum-Heading spectrum-Heading--L spectrum-Heading-serif" },
+                format!(
+                    "{} cards:",
+                    (&model)
+                        .entities
+                        .decks
+                        .get(&deck_id)
+                        .as_ref()
+                        .map(|d| d.name.as_str())
+                        .unwrap_or("unknown deck"),
+                )
+            ],
+        ],
+        table(
+            page_cards.clone(),
+            vec!["Front", "Score"],
+            |c: usize| {
+                let card = &model.entities.cards.get(&c).unwrap();
+                vec![
+                    link(
+                        card.front.as_str(),
+                        format!("{}", Route::CardDetails(c)).as_str(),
+                    ),
+                    span![card.score.last().map(|d| "+").unwrap_or("-")],
+                ]
+            },
+            Some((
+                move |selected: HashSet<usize>| {
+                    selected_cards.set(selected);
+                },
+                selected_cards.get()
+            )),
+        ),
+        action_bar(vec![
+            checkbox(
+                if selected_cards.get().len() == deck_length {
+                    CheckboxStatus::Checked
+                } else if selected_cards.get().len() == 0 {
+                    CheckboxStatus::Empty
+                } else {
+                    CheckboxStatus::Indeterminate
+                },
+                false,
+                move |_| {
+                    if selected_cards.get().len() == deck_length {
+                        selected_cards.set(HashSet::new());
+                    } else {
+                        selected_cards.set(deck_cards.into_iter().collect());
+                    }
+                },
+                format!("{} selected", selected_cards.get().len()).as_str()
+            ),
+            div![
+                C!["spectrum-ActionGroup"],
+                button(
+                    "Create Set",
+                    ButtonType::Action,
+                    move |_| Msg::Sets(SetsMsg::GotoAddSet(GotoAddSetPayload {
+                        username: un,
+                        deck_id,
+                        cards: selected_cards.get().iter().cloned().collect::<Vec<usize>>()
+                    })),
+                    selected_cards.get().len() == 0
+                ),
+                button(
+                    "Study",
+                    ButtonType::Action,
+                    move |_| Msg::Session(SessionMsg::Study(StudyPayload {
+                        cards: session_cards
+                    })),
+                    selected_cards.get().len() == 0
+                )
+            ]
+        ]),
+        pager(page.get(), deck_length / page_size.get() + 1, move |i| {
+            page.set(i)
+        }),
         button![
             "Prev",
             ev(Ev::Click, move |_| page.set(page.get() - 1)),
@@ -116,39 +153,11 @@ pub fn view(model: &Model, username: &str, deck_id: usize) -> Node<Msg> {
         ],
         br![],
         br![],
-        button![
-            "Add set",
-            ev(Ev::Click, move |_| Msg::Sets(SetsMsg::GotoAddSet(
-                GotoAddSetPayload {
-                    username: un,
-                    deck_id,
-                    cards: selected_cards.get().iter().cloned().collect::<Vec<usize>>()
-                }
-            )))
-        ],
         br![],
-        a![
-            "Add card",
-            attrs! { At::Href => Route::AddCard(username.to_owned(), deck_id) }
-        ],
-        br![],
-        a![
-            "View sets",
-            attrs! { At::Href => Route::DeckSets(username.to_owned(), deck_id) }
-        ],
-        br![],
-        button![
-            "Study",
-            ev(Ev::Click, |_| Msg::Session(SessionMsg::Study(
-                StudyPayload {
-                    cards: session_cards
-                }
-            ))),
-            if selected_cards.get().is_empty() {
-                attrs! { At::Disabled => true }
-            } else {
-                attrs! {}
-            }
-        ]
+        button_link(
+            "Add Card",
+            ButtonType::CTA,
+            format!("{}", Route::AddCard(username.to_owned(), deck_id)).as_str()
+        )
     ]
 }

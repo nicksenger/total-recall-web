@@ -7,6 +7,7 @@ pub enum ButtonType {
     Primary,
     Secondary,
     Warning,
+    Action,
 }
 
 pub fn button<MsU: 'static>(
@@ -15,19 +16,21 @@ pub fn button<MsU: 'static>(
     on_click: impl FnOnce(web_sys::Event) -> MsU + 'static + Clone,
     disabled: bool,
 ) -> Node<Msg> {
-    let btn_class = format!("spectrum-Button spectrum-ButtonGroup-item {}", match button_type {
-        ButtonType::CTA => "spectrum-Button--cta",
-        ButtonType::Primary => "spectrum-Button--primary",
-        ButtonType::Secondary => "spectrum-Button--secondary",
-        ButtonType::Warning => "spectrum-Button--warning",
-    });
+    let btn_class = match button_type {
+        ButtonType::CTA => "spectrum-Button spectrum-ButtonGroup-item spectrum-Button--cta",
+        ButtonType::Primary => "spectrum-Button spectrum-ButtonGroup-item spectrum-Button--primary",
+        ButtonType::Secondary => "spectrum-Button spectrum-ButtonGroup-item spectrum-Button--secondary",
+        ButtonType::Warning => "spectrum-Button spectrum-ButtonGroup-item spectrum-Button--warning",
+        ButtonType::Action => "spectrum-ActionButton spectrum-ActionButton--quiet spectrum-ActionGroup-item"
+    };
+    let label_class = match button_type {
+        ButtonType::Action => "spectrum-ActionButton-label",
+        _ => "spectrum-Button-label"
+    };
     button![
-        if disabled {
-            attrs! { At::Class => btn_class, At::Disabled => "true" }
-        } else {
-            attrs! { At::Class => btn_class }
-        },
-        span![attrs! { At::Class => "spectrum-Button-label" }, text],
+        C![btn_class],
+        attrs! { At::Disabled => disabled.as_at_value() },
+        span![C![label_class], text],
         ev(Ev::Click, |ev| {
             ev.prevent_default();
             on_click(ev)

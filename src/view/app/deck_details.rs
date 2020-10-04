@@ -75,7 +75,7 @@ pub fn view(model: &Model, deck_id: usize, username: &str) -> Node<Msg> {
                         button_link(
                             "View Cards",
                             ButtonType::Primary,
-                            format!("{}", Route::DeckCards(username.to_owned(), deck_id)).as_str()
+                            format!("{}", Route::DeckCards(username.to_owned(), deck_id)).as_str(),
                         ),
                         button_link(
                             "View Sets",

@@ -1,11 +1,21 @@
+mod action_bar;
 mod app_frame;
+mod checkbox;
 mod dialog;
 mod form;
+mod icons;
 mod link;
+mod pager;
 mod side_menu;
+mod table;
 
+pub use action_bar::action_bar;
 pub use app_frame::app_frame;
+pub use checkbox::*;
 pub use dialog::dialog;
-pub use form::{button, button_link, combobox, text_input, ButtonType};
+pub use form::*;
+pub use icons::*;
 pub use link::link;
+pub use pager::pager;
 pub use side_menu::side_menu;
+pub use table::table;
