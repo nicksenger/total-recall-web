@@ -7,7 +7,7 @@ use crate::{
         decks::{DecksMsg, GetDecksPayload},
         routing::RoutingMsg,
         session::SessionMsg,
-        sets::{AddSetSuccessPayload, GetSetsPayload, GotoAddSetPayload, SetsMsg},
+        sets::{AddSetSuccessPayload, GetSetsPayload, SetsMsg},
         Msg,
     },
     state::{routing::Route, Model},
@@ -46,17 +46,6 @@ pub fn operate(msg: &Msg, model: &Model, orders: &mut impl Orders<Msg>) {
             }
         }
 
-        Msg::Sets(SetsMsg::GotoAddSet(GotoAddSetPayload {
-            username,
-            deck_id,
-            cards: _,
-        })) => {
-            orders.send_msg(Msg::Routing(RoutingMsg::Push(Route::AddSet(
-                username.to_owned(),
-                *deck_id,
-            ))));
-        }
-
         Msg::Sets(SetsMsg::AddSetSuccess(AddSetSuccessPayload { deck_id })) => {
             if let Some(username) = &model.authentication.username {
                 orders.send_msg(Msg::Routing(RoutingMsg::Push(Route::DeckSets(
@@ -77,6 +66,10 @@ pub fn operate(msg: &Msg, model: &Model, orders: &mut impl Orders<Msg>) {
 
         Msg::Cards(CardsMsg::DeleteCardSuccess(_)) => {
             let _ = seed::history().back();
+        }
+
+        Msg::Cards(CardsMsg::EditCardLinkSuccess(x)) => {
+            orders.send_msg(Msg::Routing(RoutingMsg::Push(Route::CardDetails(x.card_id))));
         }
 
         Msg::Sets(SetsMsg::DeleteSetSuccess(_)) => {

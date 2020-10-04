@@ -32,12 +32,6 @@ pub struct GetSetsSuccessPayload {
     pub deck_id: usize,
 }
 
-pub struct GotoAddSetPayload {
-    pub username: String,
-    pub deck_id: usize,
-    pub cards: Vec<usize>,
-}
-
 pub enum SetsMsg {
     AddSet(AddSetPayload),
     AddSetFetched(
@@ -60,5 +54,4 @@ pub enum SetsMsg {
     ),
     GetSetsFailed(ErrorPayload),
     GetSetsSuccess(GetSetsSuccessPayload),
-    GotoAddSet(GotoAddSetPayload),
 }

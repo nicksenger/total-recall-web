@@ -9,11 +9,11 @@ use crate::{
         session::{SessionMsg, StudyPayload},
         Msg,
     },
-    state::{routing::Route, Model, entities::Card},
+    state::{entities::Card, routing::Route, Model},
 };
 
 #[topo::nested]
-pub fn view(model: &Model, username: &str, deck_id: usize) -> Node<Msg> {
+pub fn view(model: &Model, _username: &str, deck_id: usize) -> Node<Msg> {
     if model.ui.sets_screen.loading {
         return p!["loading..."];
     }
@@ -34,12 +34,16 @@ pub fn view(model: &Model, username: &str, deck_id: usize) -> Node<Msg> {
     let session_cards = selected_sets
         .get()
         .iter()
+        .filter(|id| model.entities.sets.contains_key(id))
         .flat_map(|id| {
-            (&model).entities.set_cards.get(&id).map(|sc| {
-                sc.iter()
-                    .filter(|card_id| (&model).entities.cards.get(*card_id).is_some())
-                    .map(|id| (&model).entities.cards.get(id).unwrap().clone()).collect::<Vec<Card>>()
-            })
+            model
+                .entities
+                .set_cards
+                .get(id)
+                .unwrap()
+                .iter()
+                .filter(|id| model.entities.cards.contains_key(id))
+                .map(|id| model.entities.cards.get(id).unwrap().clone())
         })
         .collect::<Vec<Card>>();
 
@@ -49,7 +53,7 @@ pub fn view(model: &Model, username: &str, deck_id: usize) -> Node<Msg> {
             h1![
                 attrs! { At::Class => "spectrum-Heading spectrum-Heading--L spectrum-Heading-serif" },
                 format!(
-                    "{} cards:",
+                    "{} sets",
                     (&model)
                         .entities
                         .decks

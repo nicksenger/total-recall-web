@@ -27,77 +27,74 @@ pub fn view(model: &Model, deck_id: usize, username: &str) -> Node<Msg> {
                 )
             ],
         ],
+        IF!(modal_visible.get() =>
+            dialog(
+                format!(
+                    "Delete Deck \"{}\" ?",
+                    deck.map(|d| d.name.as_str()).unwrap_or("Unknown deck")
+                )
+                .as_str(),
+                p!["Are you sure you want to delete this deck? All cards and sets for this deck will also be deleted."],
+                vec![
+                    button(
+                        "Cancel",
+                        ButtonType::Secondary,
+                        move |_| {
+                            modal_visible.set(false);
+                            Msg::Routing(RoutingMsg::ModalOpen(false))
+                        },
+                        false,
+                    ),
+                    button(
+                        "Delete",
+                        ButtonType::Warning,
+                        move |_| {
+                            modal_visible.set(false);
+                            Msg::Decks(DecksMsg::DeleteDeck(DeleteDeckPayload { deck_id }))
+                        },
+                        false,
+                    ),
+                ],
+            )
+        ),
         if model.ui.deck_details_screen.loading {
-            vec![vec![p!["loading..."]]]
+            vec![p!["loading..."]]
         } else {
             vec![
-                if modal_visible.get() {
-                    vec![
-                        dialog(
-                            format!(
-                                "Delete Deck \"{}\" ?",
-                                deck.map(|d| d.name.as_str()).unwrap_or("Unknown deck")
-                            )
-                            .as_str(),
-                            p!["Are you sure you want to delete this deck? All cards and sets for this deck will also be deleted."],
-                            vec![
-                                button(
-                                    "Cancel",
-                                    ButtonType::Secondary,
-                                    move |_| modal_visible.set(false),
-                                    false,
-                                ),
-                                button(
-                                    "Delete",
-                                    ButtonType::Warning,
-                                    move |_| {
-                                        modal_visible.set(false);
-                                        Msg::Decks(DecksMsg::DeleteDeck(DeleteDeckPayload { deck_id }))
-                                    },
-                                    false,
-                                ),
-                            ],
-                        ),
-                    ]
-                } else {
-                    vec![]
-                },
-                vec![
-                    p![
-                        "Language: ",
-                        strong![deck.map(|d| d.language.as_str()).unwrap_or("")],
-                        attrs! { At::Class => "spectrum-Body spectrum-Body--M" }
-                    ],
-                    br![],
-                    br![],
-                    div![
-                        attrs! { At::Class => "spectrum-ButtonGroup spectrum-ButtonGroup--vertical" },
-                        button_link(
-                            "View Cards",
-                            ButtonType::Primary,
-                            format!("{}", Route::DeckCards(username.to_owned(), deck_id)).as_str(),
-                        ),
-                        button_link(
-                            "View Sets",
-                            ButtonType::Primary,
-                            format!("{}", Route::DeckSets(username.to_owned(), deck_id)).as_str()
-                        ),
-                        button(
-                            "Delete Deck",
-                            ButtonType::Warning,
-                            move |_| {
-                                modal_visible.set(true);
-                                Msg::Routing(RoutingMsg::ModalOpen(true))
-                            },
-                            model
-                                .authentication
-                                .username
-                                .as_ref()
-                                .map(|s| s.as_str())
-                                .unwrap_or("")
-                                != username
-                        )
-                    ],
+                p![
+                    "Language: ",
+                    strong![deck.map(|d| d.language.as_str()).unwrap_or("")],
+                    attrs! { At::Class => "spectrum-Body spectrum-Body--M" }
+                ],
+                br![],
+                br![],
+                div![
+                    C!["spectrum-ButtonGroup spectrum-ButtonGroup--vertical"],
+                    button_link(
+                        "View Cards",
+                        ButtonType::Primary,
+                        format!("{}", Route::DeckCards(username.to_owned(), deck_id)).as_str(),
+                    ),
+                    button_link(
+                        "View Sets",
+                        ButtonType::Primary,
+                        format!("{}", Route::DeckSets(username.to_owned(), deck_id)).as_str()
+                    ),
+                    button(
+                        "Delete Deck",
+                        ButtonType::Warning,
+                        move |_| {
+                            modal_visible.set(true);
+                            Msg::Routing(RoutingMsg::ModalOpen(true))
+                        },
+                        model
+                            .authentication
+                            .username
+                            .as_ref()
+                            .map(|s| s.as_str())
+                            .unwrap_or("")
+                            != username
+                    )
                 ],
             ]
         }

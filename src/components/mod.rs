@@ -1,5 +1,6 @@
 mod action_bar;
 mod app_frame;
+mod card;
 mod checkbox;
 mod dialog;
 mod form;
@@ -11,6 +12,7 @@ mod table;
 
 pub use action_bar::action_bar;
 pub use app_frame::app_frame;
+pub use card::card;
 pub use checkbox::*;
 pub use dialog::dialog;
 pub use form::*;

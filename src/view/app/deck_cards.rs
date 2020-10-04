@@ -18,7 +18,7 @@ use crate::{
 };
 
 #[topo::nested]
-pub fn view(model: &Model, username: &str, deck_id: usize) -> Node<Msg> {
+pub fn view(model: &Model, _username: &str, deck_id: usize) -> Node<Msg> {
     if model.ui.cards_screen.loading {
         return p!["loading..."];
     }
@@ -66,7 +66,7 @@ pub fn view(model: &Model, username: &str, deck_id: usize) -> Node<Msg> {
             h1![
                 attrs! { At::Class => "spectrum-Heading spectrum-Heading--L spectrum-Heading-serif" },
                 format!(
-                    "{} cards:",
+                    "{} cards",
                     (&model)
                         .entities
                         .decks
