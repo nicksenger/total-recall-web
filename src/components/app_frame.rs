@@ -3,7 +3,7 @@ use seed_hooks::*;
 use seed_style::{pc, px, *};
 
 use super::side_menu;
-use crate::{messages::Msg, state::Model};
+use crate::{BASE_URI, messages::Msg, state::Model};
 
 pub fn app_frame(model: &Model, content: Vec<Node<Msg>>) -> Node<Msg> {
     let menu_open = seed_hooks::use_state(|| false);
@@ -44,6 +44,11 @@ pub fn app_frame(model: &Model, content: Vec<Node<Msg>>) -> Node<Msg> {
             button![
                 C!["spectrum-ActionButton", "spectrum-ActionButton--quiet"],
                 ev(Ev::Click, move |_| menu_open.set(!menu_open.get())),
+                img![
+                    s().width(px(20)),
+                    s().height(px(20)),
+                    attrs! { At::Src => format!("{}/show_menu.svg", BASE_URI) },
+                ]
             ]
         ],
         div![

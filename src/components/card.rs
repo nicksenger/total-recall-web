@@ -31,16 +31,6 @@ pub fn card(card: &Card) -> Node<Msg> {
                         ],
                         card.back.as_str()
                     ],
-                    div![
-                        C!["spectrum-Card-actionButton"],
-                        button![
-                            C!["spectrum-ActionButton" "spectrum-ActionButton--quiet"],
-                            "Audio",
-                            ev(Ev::Click, |_| Msg::Session(SessionMsg::PlayAudio(
-                                PlayAudioPayload { uri: audio }
-                            )))
-                        ]
-                    ]
                 ],
                 div![
                     C!["spectrum-Card-content"],
@@ -55,7 +45,29 @@ pub fn card(card: &Card) -> Node<Msg> {
                 ]
             ],
             div![
+                s().display("flex"),
+                s().flex_direction("row-reverse"),
+                s().align_items("center"),
+                s().justify_content("space-between"),
+                s().padding_top("var(--spectrum-card-footer-padding-top, var(--spectrum-global-dimension-size-100))"),
+                s().padding_bottom("var(--spectrum-card-footer-padding-bottom, var(--spectrum-global-dimension-size-150))"),
                 C!["spectrum-Card-footer"],
+                div![
+                    C!["spectrum-Card-actionButton"],
+                    button![
+                        C!["spectrum-ActionButton" "spectrum-ActionButton--quiet"],
+                        img![
+                            s().width(px(16)),
+                            s().height(px(16)),
+                            s().margin_x(px(4)),
+                            attrs! { At::Src => format!("{}/audio.svg", BASE_URI) },
+                        ],
+                        "Audio",
+                        ev(Ev::Click, |_| Msg::Session(SessionMsg::PlayAudio(
+                            PlayAudioPayload { uri: audio }
+                        )))
+                    ]
+                ],
                 IF!(card.link.is_some() => link(
                     "Context",
                     card.link.as_ref().unwrap()
