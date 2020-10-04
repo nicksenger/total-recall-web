@@ -4,8 +4,12 @@ use seed::{prelude::*, *};
 use seed_hooks::*;
 
 use crate::{
-    messages::Msg,
-    state::{routing::Route, Model},
+    components::*,
+    messages::{
+        session::{SessionMsg, StudyPayload},
+        Msg,
+    },
+    state::{routing::Route, Model, entities::Card},
 };
 
 #[topo::nested]
@@ -15,59 +19,97 @@ pub fn view(model: &Model, username: &str, deck_id: usize) -> Node<Msg> {
     }
 
     let selected_sets = use_state(HashSet::<usize>::new);
+    let deck_sets = (&model)
+        .entities
+        .deck_sets
+        .get(&deck_id)
+        .map(|ds| {
+            ds.iter()
+                .map(|set_id| (&model).entities.sets.get(set_id))
+                .filter(|x| x.is_some())
+                .map(|c| c.unwrap().id)
+                .collect::<Vec<usize>>()
+        })
+        .unwrap_or(vec![]);
+    let session_cards = selected_sets
+        .get()
+        .iter()
+        .flat_map(|id| {
+            (&model).entities.set_cards.get(&id).map(|sc| {
+                sc.iter()
+                    .filter(|card_id| (&model).entities.cards.get(*card_id).is_some())
+                    .map(|id| (&model).entities.cards.get(id).unwrap().clone()).collect::<Vec<Card>>()
+            })
+        })
+        .collect::<Vec<Card>>();
 
     div![
-        h3![format!(
-            "{} sets:",
-            (&model)
-                .entities
-                .decks
-                .get(&deck_id)
-                .as_ref()
-                .map(|d| d.name.as_str())
-                .unwrap_or("unknown deck"),
-        )],
-        ul![(&model)
-            .entities
-            .deck_sets
-            .get(&deck_id)
-            .map(|ds| ds.iter().map(|set_id| (&model)
-                .entities
-                .sets
-                .get(set_id)
-                .map(|s| {
-                    let id = s.id;
-                    li![
-                        input![
-                            ev(Ev::Change, move |_| {
-                                let mut s = selected_sets.get();
-                                if s.contains(&id) {
-                                    s.remove(&id);
-                                } else {
-                                    s.insert(id);
-                                }
-                                selected_sets.set(s);
-                            }),
-                            attrs! { At::Type => "checkbox" },
-                            if selected_sets.get().contains(&id) {
-                                attrs! { At::Checked => true }
-                            } else {
-                                attrs! {}
-                            }
-                        ],
-                        a![
-                            s.name.to_owned(),
-                            attrs! { At::Href => Route::SetDetails(s.id) }
-                        ]
-                    ]
-                })
-                .unwrap_or(div![])))
-            .unwrap()],
-        br![],
-        br![],
-        a![
-            "View cards",
-            attrs! { At::Href => Route::DeckCards(username.to_owned(), deck_id) }
-        ]
+        header![
+            attrs! { At::Class => "spectrum-CSSComponent-heading" },
+            h1![
+                attrs! { At::Class => "spectrum-Heading spectrum-Heading--L spectrum-Heading-serif" },
+                format!(
+                    "{} cards:",
+                    (&model)
+                        .entities
+                        .decks
+                        .get(&deck_id)
+                        .as_ref()
+                        .map(|d| d.name.as_str())
+                        .unwrap_or("unknown deck"),
+                )
+            ],
+        ],
+        table(
+            deck_sets.clone(),
+            vec!["Name", "Score"],
+            |id: usize| {
+                let set = &model.entities.sets.get(&id).unwrap();
+                vec![
+                    link(
+                        set.name.as_str(),
+                        format!("{}", Route::SetDetails(id)).as_str(),
+                    ),
+                    span!["-"],
+                ]
+            },
+            Some((
+                move |selected: HashSet<usize>| {
+                    selected_sets.set(selected);
+                },
+                selected_sets.get()
+            )),
+        ),
+        action_bar(vec![
+            checkbox(
+                if selected_sets.get().len() == deck_sets.len() {
+                    CheckboxStatus::Checked
+                } else if selected_sets.get().len() == 0 {
+                    CheckboxStatus::Empty
+                } else {
+                    CheckboxStatus::Indeterminate
+                },
+                false,
+                move |_| {
+                    if selected_sets.get().len() == deck_sets.len() {
+                        selected_sets.set(HashSet::new());
+                    } else {
+                        selected_sets.set(deck_sets.into_iter().collect());
+                    }
+                },
+                format!("{} selected", selected_sets.get().len()).as_str()
+            ),
+            div![
+                C!["spectrum-ActionGroup"],
+                button(
+                    "Study",
+                    ButtonType::Action,
+                    move |_| Msg::Session(SessionMsg::Study(StudyPayload {
+                        cards: session_cards
+                    })),
+                    selected_sets.get().len() == 0
+                )
+            ]
+        ])
     ]
 }
