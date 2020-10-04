@@ -16,15 +16,15 @@ pub fn view(model: &Model) -> Node<Msg> {
     if model.authentication.token.is_none() {
         div![
             header![
-                attrs! { At::Class => "spectrum-CSSComponent-heading" },
+                C!["spectrum-CSSComponent-heading"],
                 h1![
-                    attrs! { At::Class => "spectrum-Heading spectrum-Heading--XXXL spectrum-Heading-serif" },
+                    C!["spectrum-Heading spectrum-Heading--XXXL spectrum-Heading-serif"],
                     "Unauthorized"
                 ],
             ],
             p![
                 "You must be logged in to study.",
-                attrs! { At::Class => "spectrum-Body spectrum-Body--M" }
+                C!["spectrum-Body spectrum-Body--M"],
             ],
         ]
     } else if model.session.loading {
@@ -36,15 +36,15 @@ pub fn view(model: &Model) -> Node<Msg> {
     } else {
         div![
             header![
-                attrs! { At::Class => "spectrum-CSSComponent-heading" },
+                C!["spectrum-CSSComponent-heading"],
                 h1![
-                    attrs! { At::Class => "spectrum-Heading spectrum-Heading--L spectrum-Heading-serif" },
+                    C!["spectrum-Heading spectrum-Heading--L spectrum-Heading-serif"],
                     "No Cards"
                 ],
             ],
             p![
+                C!["spectrum-Body spectrum-Body--M"],
                 "There are currently no cards to study in the queue. You can add some from the cards page of any deck.",
-                attrs! { At::Class => "spectrum-Body spectrum-Body--M" }
             ],
         ]
     }

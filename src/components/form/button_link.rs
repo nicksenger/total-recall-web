@@ -12,12 +12,14 @@ pub fn button_link(text: &str, button_type: ButtonType, href: &str) -> Node<Msg>
             ButtonType::Primary => "spectrum-Button--primary",
             ButtonType::Secondary => "spectrum-Button--secondary",
             ButtonType::Warning => "spectrum-Button--warning",
-            ButtonType::Action => "spectrum-ActionButton spectrum-ActionButton--quiet spectrum-ActionGroup-item"
+            ButtonType::Action =>
+                "spectrum-ActionButton spectrum-ActionButton--quiet spectrum-ActionGroup-item",
         }
     );
     a![
-        attrs! { At::Href => href, At::Class => btn_class },
-        span![attrs! { At::Class => "spectrum-Button-label" }, text],
+        C![btn_class],
+        attrs! { At::Href => href },
+        span![C!["spectrum-Button-label"], text],
         s().text_decoration("none"),
     ]
 }

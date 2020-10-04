@@ -18,9 +18,9 @@ pub fn view(model: &Model) -> Node<Msg> {
 
     div![
         header![
-            attrs! { At::Class => "spectrum-CSSComponent-heading" },
+            C!["spectrum-CSSComponent-heading"],
             h1![
-                attrs! { At::Class => "spectrum-Heading spectrum-Heading--XXXL spectrum-Heading-serif" },
+                C!["spectrum-Heading spectrum-Heading--XXXL spectrum-Heading-serif"],
                 "Register"
             ],
         ],
@@ -45,7 +45,7 @@ pub fn view(model: &Model) -> Node<Msg> {
                 ],
                 br![],
                 form![
-                    attrs! { At::Class => "spectrum-Form" },
+                    C!["spectrum-Form"],
                     text_input(
                         "text",
                         "Username",

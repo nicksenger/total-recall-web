@@ -18,9 +18,9 @@ pub fn view(model: &Model, deck_id: usize, username: &str) -> Node<Msg> {
 
     div![
         header![
-            attrs! { At::Class => "spectrum-CSSComponent-heading" },
+            C!["spectrum-CSSComponent-heading"],
             h1![
-                attrs! { At::Class => "spectrum-Heading spectrum-Heading--L spectrum-Heading-serif" },
+                C!["spectrum-Heading spectrum-Heading--L spectrum-Heading-serif"],
                 format!(
                     "{}",
                     deck.map(|d| d.name.as_str()).unwrap_or("Unknown deck")
@@ -64,7 +64,7 @@ pub fn view(model: &Model, deck_id: usize, username: &str) -> Node<Msg> {
                 p![
                     "Language: ",
                     strong![deck.map(|d| d.language.as_str()).unwrap_or("")],
-                    attrs! { At::Class => "spectrum-Body spectrum-Body--M" }
+                    C!["spectrum-Body spectrum-Body--M"],
                 ],
                 br![],
                 br![],

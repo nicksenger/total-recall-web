@@ -42,9 +42,7 @@ pub fn app_frame(model: &Model, content: Vec<Node<Msg>>) -> Node<Msg> {
             s().padding("var(--spectrum-global-dimension-size-100)"),
             s().media("@media screen and (max-width: 960px)").display("block"),
             button![
-                attrs! {
-                    At::Class => "spectrum-ActionButton spectrum-ActionButton--quiet"
-                },
+                C!["spectrum-ActionButton", "spectrum-ActionButton--quiet"],
                 ev(Ev::Click, move |_| menu_open.set(!menu_open.get())),
             ]
         ],
@@ -80,7 +78,7 @@ pub fn app_frame(model: &Model, content: Vec<Node<Msg>>) -> Node<Msg> {
                         s().margin("var(--spectrum-global-dimension-size-500) auto"),
                         s().padding("0 var(--spectrum-global-dimension-size-700)"),
                         s().width("-webkit-fill-available"),
-                        hr![attrs! { At::Class => "spectrum-Divider spectrum-Divider--small" }],
+                        hr![C!["spectrum-Divider", "spectrum-Divider--small"]],
                         footer![
                             s().background_color("var(--spectrum-global-color-gray-50)"),
                             div![
@@ -115,9 +113,7 @@ pub fn app_frame(model: &Model, content: Vec<Node<Msg>>) -> Node<Msg> {
             ]
         ],
         div![
-            attrs! {
-                At::Class => if model.routing.modal_open { "spectrum-Underlay is-open" } else { "spectrum-Underlay" }
-            }
+            C!["spectrum-Underlay", IF!(model.routing.modal_open => "is-open")],
         ]
     ]
 }

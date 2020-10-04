@@ -6,15 +6,15 @@ use crate::{components::link, messages::Msg, state::Model, BASE_URI};
 pub fn view(_model: &Model) -> Node<Msg> {
     div![
         header![
-            attrs! { At::Class => "spectrum-CSSComponent-heading" },
+            C!["spectrum-CSSComponent-heading"],
             h1![
-                attrs! { At::Class => "spectrum-Heading spectrum-Heading--XXXL spectrum-Heading-serif" },
+                C!["spectrum-Heading spectrum-Heading--XXXL spectrum-Heading-serif"],
                 "Welcome to Total Recall"
             ],
         ],
         p![
+            C!["spectrum-Body spectrum-Body--M"],
             "Total Recall is a spaced-repetition flashcard application designed to enable efficient study of foreign language vocabulary.",
-            attrs! { At::Class => "spectrum-Body spectrum-Body--M" }
         ],
         br![],
         br![],
@@ -95,14 +95,14 @@ fn home_section(title: &str, description: Vec<&str>, links: Vec<Node<Msg>>) -> N
         s().padding_right(px(16)),
         s().padding_left(px(16)),
         h3![
-            attrs! { At::Class => "spectrum-Heading spectrum-Heading--S" },
+            C!["spectrum-Heading spectrum-Heading--S"],
             title
         ],
         br![],
         div![
-            p![attrs! { At::Class => "spectrum-Body--M" }, description],
+            p![C!["spectrum-Body--M"], description],
             br![],
-            p![attrs! { At::Class => "spectrum-Body--M" }, links],
+            p![C!["spectrum-Body--M"], links],
         ],
         br![],
     ]

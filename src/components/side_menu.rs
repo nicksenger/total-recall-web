@@ -57,20 +57,21 @@ pub fn side_menu(model: &Model, menu_open: bool) -> Node<Msg> {
           s().padding("0 var(--spectrum-global-dimension-size-300) var(--spectrum-global-dimension-size-300) var(--spectrum-global-dimension-size-300)"),
           s().width(px(200)),
           hr![
-              attrs! { At::Class => "spectrum-Divider spectrum-Divider--small" },
+              C!["spectrum-Divider spectrum-Divider--small"],
           ],
           div![
-              attrs! { At::Class => "spectrum-Switch" },
+              C!["spectrum-Switch"],
               input![
+                C!["spectrum-Switch-input"],
                 if model.ui.dark_theme {
-                  attrs! { At::Type => "checkbox", At::Class => "spectrum-Switch-input", At::Id => "theme-switch", At::Checked => "true" }
+                  attrs! { At::Type => "checkbox", At::Id => "theme-switch", At::Checked => "true" }
                 } else {
-                  attrs! { At::Type => "checkbox", At::Class => "spectrum-Switch-input" }
+                  attrs! { At::Type => "checkbox" }
                 },
                 ev(Ev::Change, move |_| Msg::Cache(CacheMsg::ToggleDarkTheme(!dark)))
               ],
-              span![ attrs! { At::Class => "spectrum-Switch-switch" } ],
-              label![ attrs! { At::Class => "spectrum-Switch-label", At::For => "theme-switch" }, if dark { "Dark" } else { "Light" }],
+              span![ C!["spectrum-Switch-switch"] ],
+              label![ C!["spectrum-Switch-label"], attrs! { At::For => "theme-switch" }, if dark { "Dark" } else { "Light" }],
           ],
         ],
         div![
@@ -81,47 +82,41 @@ pub fn side_menu(model: &Model, menu_open: bool) -> Node<Msg> {
           nav![
             if let Some(username) = &model.authentication.username {
               ul![
-                attrs! { At::Class => "spectrum-SideNav spectrum-SideNav--multiLevel" },
+                C!["spectrum-SideNav spectrum-SideNav--multiLevel"],
                 li![
-                  attrs! {
-                    At::Class => format!(
-                      "spectrum-SideNav-item{}",
-                      match model.routing.route {
-                        Route::Decks(_) | Route::AddCard(_, _) | Route::AddSet(_, _) | Route::AddDeck(_) | Route::CardDetails(_) | Route::SetDetails(_) | Route::DeckSets(_, _) | Route::DeckCards(_, _) => " is-selected",
-                        _ => ""
-                      }
-                    )
-                  },
-                  a![ attrs! { At::Class => "spectrum-SideNav-itemLink", At::Href => Route::Decks(username.clone()) }, "Decks"]
+                  C![format!(
+                    "spectrum-SideNav-item{}",
+                    match model.routing.route {
+                      Route::Decks(_) | Route::AddCard(_, _) | Route::AddSet(_, _) | Route::AddDeck(_) | Route::CardDetails(_) | Route::SetDetails(_) | Route::DeckSets(_, _) | Route::DeckCards(_, _) => " is-selected",
+                      _ => ""
+                    }
+                  )],
+                  a![ C!["spectrum-SideNav-itemLink"], attrs! { At::Href => Route::Decks(username.clone()) }, "Decks"]
                 ],
                 li![
-                  attrs! {
-                    At::Class => format!(
-                      "spectrum-SideNav-item{}",
-                      match model.routing.route {
-                        Route::Study => " is-selected",
-                        _ => ""
-                      }
-                    )
-                  },
-                  a![ attrs! { At::Class => "spectrum-SideNav-itemLink", At::Href => Route::Study }, "Study"]
+                  C![format!(
+                    "spectrum-SideNav-item{}",
+                    match model.routing.route {
+                      Route::Study => " is-selected",
+                      _ => ""
+                    }
+                  )],
+                  a![ C!["spectrum-SideNav-itemLink"], attrs! { At::Href => Route::Study }, "Study"]
                 ],
                 li![
-                  attrs! {
-                    At::Class => format!(
-                      "spectrum-SideNav-item{}",
-                      match model.routing.route {
-                        Route::Manual => " is-selected",
-                        _ => ""
-                      }
-                    )
-                  },
-                  a![ attrs! { At::Class => "spectrum-SideNav-itemLink", At::Href => Route::Manual }, "User Manual"]
+                  C![format!(
+                    "spectrum-SideNav-item{}",
+                    match model.routing.route {
+                      Route::Manual => " is-selected",
+                      _ => ""
+                    }
+                  )],
+                  a![ C!["spectrum-SideNav-itemLink"], attrs! { At::Href => Route::Manual }, "User Manual"]
                 ],
                 li![
                   a![
+                    C!["spectrum-SideNav-itemLink"],
                     attrs! {
-                      At::Class => "spectrum-SideNav-itemLink",
                       At::Href => Route::Home },
                       format!("Logout ({})", username),
                       ev(Ev::Click, |_| Msg::Authentication(AuthMsg::Logout)),
@@ -130,42 +125,36 @@ pub fn side_menu(model: &Model, menu_open: bool) -> Node<Msg> {
               ]
             } else {
               ul![
-                attrs! { At::Class => "spectrum-SideNav spectrum-SideNav--multiLevel" },
+                C!["spectrum-SideNav spectrum-SideNav--multiLevel"],
                 li![
-                  attrs! {
-                    At::Class => format!(
-                      "spectrum-SideNav-item{}",
-                      match model.routing.route {
-                        Route::Login => " is-selected",
-                        _ => ""
-                      }
-                    )
-                  },
-                  a![ attrs! { At::Class => "spectrum-SideNav-itemLink", At::Href => Route::Login }, "Login"]
+                  C![format!(
+                    "spectrum-SideNav-item{}",
+                    match model.routing.route {
+                      Route::Login => " is-selected",
+                      _ => ""
+                    }
+                  )],
+                  a![ C!["spectrum-SideNav-itemLink"], attrs! { At::Href => Route::Login }, "Login"]
                 ],
                 li![
-                  attrs! {
-                    At::Class => format!(
-                      "spectrum-SideNav-item{}",
-                      match model.routing.route {
-                        Route::Register => " is-selected",
-                        _ => ""
-                      }
-                    )
-                  },
-                  a![ attrs! { At::Class => "spectrum-SideNav-itemLink", At::Href => Route::Register }, "Register"]
+                  C![format!(
+                    "spectrum-SideNav-item{}",
+                    match model.routing.route {
+                      Route::Register => " is-selected",
+                      _ => ""
+                    }
+                  )],
+                  a![ C!["spectrum-SideNav-itemLink"], attrs! { At::Href => Route::Register }, "Register"]
                 ],
                 li![
-                  attrs! {
-                    At::Class => format!(
-                      "spectrum-SideNav-item{}",
-                      match model.routing.route {
-                        Route::Manual => " is-selected",
-                        _ => ""
-                      }
-                    )
-                  },
-                  a![ attrs! { At::Class => "spectrum-SideNav-itemLink", At::Href => Route::Manual }, "User Manual"]
+                  C![format!(
+                    "spectrum-SideNav-item{}",
+                    match model.routing.route {
+                      Route::Manual => " is-selected",
+                      _ => ""
+                    }
+                  )],
+                  a![ C!["spectrum-SideNav-itemLink"], attrs! { At::Href => Route::Manual }, "User Manual"]
                 ]
               ]
             }

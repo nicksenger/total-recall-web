@@ -13,22 +13,22 @@ where
     F: FnOnce(String),
 {
     div![
-        attrs! { At::Class => "spectrum-Form-item" },
+        C!["spectrum-Form-item"],
         label![
+            C!["spectrum-Form-itemLabel spectrum-FieldLabel--left"],
             attrs! {
-                At::Class => "spectrum-Form-itemLabel spectrum-FieldLabel--left",
                 At::For => format!("{}{}-input", label, placeholder),
             },
             label
         ],
         div![
-            attrs! { At::Class => "spectrum-Form-itemField" },
+            C!["spectrum-Form-itemField"],
             div![
-                attrs! { At::Class => "spectrum-Textfield" },
+                C!["spectrum-Textfield"],
                 input![
+                    C!["spectrum-Textfield-input"],
                     attrs! {
                         At::Type => input_type,
-                        At::Class => "spectrum-Textfield-input",
                         At::Placeholder => placeholder,
                         At::Id => format!("{}{}-input", label, placeholder),
                         At::Value => value,

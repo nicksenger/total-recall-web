@@ -5,21 +5,21 @@ use crate::{components::link, messages::Msg, state::Model};
 pub fn view(_model: &Model) -> Node<Msg> {
     div![
         header![
-            attrs! { At::Class => "spectrum-CSSComponent-heading" },
+            C!["spectrum-CSSComponent-heading"],
             p![
                 h1![
-                    attrs! { At::Class => "spectrum-Heading spectrum-Heading--XXXL spectrum-Heading-serif" },
+                    C!["spectrum-Heading spectrum-Heading--XXXL spectrum-Heading-serif"],
                     "User Manual"
                 ],
                 br![],
                 br![],
                 h3![
-                    attrs! { At::Class => "spectrum-Heading spectrum-Heading--M" },
+                    C!["spectrum-Heading spectrum-Heading--M"],
                     "Getting started"
                 ],
                 br![],
                 p![
-                    attrs! { At::Class => "spectrum-Body--M" },
+                    C!["spectrum-Body--M"],
                     "First, make a deck by clicking on \"Create Deck\" from the Decks page. Choose a name and target",
                     " language for your deck, then press \"Go!\". Total Recall will download audio in the selected ",
                     " language for each card that you add to your deck which can be played back while studying.",
@@ -29,12 +29,12 @@ pub fn view(_model: &Model) -> Node<Msg> {
                 br![],
                 br![],
                 h3![
-                    attrs! { At::Class => "spectrum-Heading spectrum-Heading--M" },
+                    C!["spectrum-Heading spectrum-Heading--M"],
                     "Adding cards"
                 ],
                 br![],
                 p![
-                    attrs! { At::Class => "spectrum-Body--M" },
+                    C!["spectrum-Body--M"],
                     "To add a card to an existing deck, first select the desired deck from the Decks page to view the ",
                     "list of all cards for that deck. From the cards page, select \"Create Card,\" then enter ",
                     "the meaning of the card in your native language in the section labeled \"Front\", and the word in the ",
@@ -44,12 +44,12 @@ pub fn view(_model: &Model) -> Node<Msg> {
                 br![],
                 br![],
                 h3![
-                    attrs! { At::Class => "spectrum-Heading spectrum-Heading--M" },
+                    C!["spectrum-Heading spectrum-Heading--M"],
                     "Studying"
                 ],
                 br![],
                 p![
-                    attrs! { At::Class => "spectrum-Body--M" },
+                    C!["spectrum-Body--M"],
                     "From the \"Cards\" screen, select as many cards as you'd like to study, then click \"Study\" to begin a ",
                     "session. The cards will be shuffled randomly, and you will be shown the word on the front of the first card. ",
                     "Try to recall the foreign language word corresponding to the displayed word in your native language (ideally ",
@@ -72,12 +72,12 @@ pub fn view(_model: &Model) -> Node<Msg> {
                 br![],
                 br![],
                 h3![
-                    attrs! { At::Class => "spectrum-Heading spectrum-Heading--M" },
+                    C!["spectrum-Heading spectrum-Heading--M"],
                     "Managing cards with sets"
                 ],
                 br![],
                 p![
-                    attrs! { At::Class => "spectrum-Body--M" },
+                    C!["spectrum-Body--M"],
                     "If you've added a large number of words to a Total Recall deck, you may quickly become overwhelmed by the number of ",
                     "cards due for review, and the sheer volume of unfamiliar material will have a detrimental impact on your ability to ",
                     "learn any new words at all. In these cases it's helpful to assign cards to particular sets which allow for quickly ",

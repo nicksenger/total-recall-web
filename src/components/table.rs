@@ -16,9 +16,7 @@ pub fn table<T: 'static + Copy + Eq + Hash>(
     multi_select: Option<(impl Fn(HashSet<T>) + 'static + Clone, HashSet<T>)>,
 ) -> Node<Msg> {
     div![
-        attrs! {
-          At::Class => "spectrum-Table"
-        },
+        C!["spectrum-Table"],
         div![
             s().display("flex"),
             C!["spectrum-Table-head"],

@@ -39,9 +39,9 @@ pub fn view(model: &Model, _username: &str) -> Node<Msg> {
 
     div![
         header![
-            attrs! { At::Class => "spectrum-CSSComponent-heading" },
+            C!["spectrum-CSSComponent-heading"],
             h1![
-                attrs! { At::Class => "spectrum-Heading spectrum-Heading--L spectrum-Heading-serif" },
+                C!["spectrum-Heading spectrum-Heading--L spectrum-Heading-serif"],
                 "Add deck"
             ],
         ],
@@ -57,7 +57,7 @@ pub fn view(model: &Model, _username: &str) -> Node<Msg> {
                 != username
         {
             p![
-                attrs! { At::Class => "spectrum-Body--M" },
+                C!["spectrum-Body--M"],
                 format!(
                     "You must be logged in as {} to add decks for {}!",
                     username, username
@@ -65,7 +65,7 @@ pub fn view(model: &Model, _username: &str) -> Node<Msg> {
             ]
         } else {
             form![
-                attrs! { At::Class => "spectrum-Form" },
+                C!["spectrum-Form"],
                 text_input(
                     "text",
                     "Name",

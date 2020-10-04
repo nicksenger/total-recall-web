@@ -62,9 +62,9 @@ pub fn view(model: &Model, _username: &str, deck_id: usize) -> Node<Msg> {
 
     div![
         header![
-            attrs! { At::Class => "spectrum-CSSComponent-heading" },
+            C!["spectrum-CSSComponent-heading"],
             h1![
-                attrs! { At::Class => "spectrum-Heading spectrum-Heading--L spectrum-Heading-serif" },
+                C!["spectrum-Heading spectrum-Heading--L spectrum-Heading-serif"],
                 format!(
                     "{} cards",
                     (&model)
@@ -80,7 +80,7 @@ pub fn view(model: &Model, _username: &str, deck_id: usize) -> Node<Msg> {
         IF!(create_card_modal_visible.get() => dialog(
             "Add Card",
             form![
-                attrs! { At::Class => "spectrum-Form" },
+                C!["spectrum-Form"],
                 text_input(
                     "text",
                     "Front",
@@ -136,7 +136,7 @@ pub fn view(model: &Model, _username: &str, deck_id: usize) -> Node<Msg> {
         IF!(create_set_modal_visible.get() => dialog(
             "Create Set",
             form![
-                attrs! { At::Class => "spectrum-Form" },
+                C!["spectrum-Form"],
                 text_input(
                     "text",
                     "Name",

@@ -35,7 +35,7 @@ fn card_view(c: &Card) -> Node<Msg> {
         IF!(edit_link_modal_visible.get() => dialog(
             "Edit Link",
             form![
-                attrs! { At::Class => "spectrum-Form" },
+                C!["spectrum-Form"],
                 text_input(
                     "text",
                     "Link",

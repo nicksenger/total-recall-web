@@ -21,24 +21,24 @@ where
         .take(8)
         .collect::<Vec<String>>();
     div![
-        attrs! { At::Class => "spectrum-Form-item" },
+        C!["spectrum-Form-item"],
         label![
+            C!["spectrum-Form-itemLabel spectrum-FieldLabel--left"],
             attrs! {
-                At::Class => "spectrum-Form-itemLabel spectrum-FieldLabel--left",
                 At::For => format!("{}-select", label),
             },
             label
         ],
         div![
-            attrs! { At::Class => "spectrum-Form-itemField" },
+            C!["spectrum-Form-itemField"],
             div![
-                attrs! { At::Class => "spectrum-InputGroup" },
+                C!["spectrum-InputGroup"],
                 div![
-                    attrs! { At::Class => "spectrum-Textfield" },
+                    C!["spectrum-Textfield"],
                     input![
+                        C!["spectrum-Textfield-input"],
                         attrs! {
                             At::Type => "text",
-                            At::Class => "spectrum-Textfield-input",
                             At::Value => value,
                         },
                         input_ev(Ev::Input, move |s| {
@@ -59,22 +59,15 @@ where
                         s().width(pc(100)),
                         s().top("100%"),
                         s().left(px(0)),
-                        attrs! {
-                            At::Class => format!(
-                                "spectrum-Popover spectrum-Popover--bottom spectrum-Picker-popover{}",
-                                if open.get() { " is-open" } else {""}
-                            ),
-                        },
+                        C!["spectrum-Popover spectrum-Popover--bottom spectrum-Picker-popover", IF!(open.get() => "is-open")],
                         ul![
-                            attrs! {
-                                At::Class => "spectrum-Menu"
-                            },
+                            C!["spectrum-Menu"],
                             filtered_options.into_iter().map(|s| {
                                 let handler = on_change.clone();
                                 li![
-                                    attrs! { At::Class => "spectrum-Menu-item" },
+                                    C!["spectrum-Menu-item"],
                                     span![
-                                        attrs! { At::Class => "spectrum-Menu-itemLabel" },
+                                        C!["spectrum-Menu-itemLabel"],
                                         s.as_str()
                                     ],
                                     ev(Ev::MouseDown, move |_| handler(s)),
