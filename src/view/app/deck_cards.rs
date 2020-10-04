@@ -3,13 +3,15 @@ use std::collections::HashSet;
 use seed::virtual_dom::update_el::UpdateEl;
 use seed::{prelude::*, *};
 use seed_hooks::*;
-use seed_style::{pc, *};
+use seed_style::*;
 
 use crate::{
     components::*,
     messages::{
+        cards::{AddCardPayload, CardsMsg},
+        routing::RoutingMsg,
         session::{SessionMsg, StudyPayload},
-        sets::{GotoAddSetPayload, SetsMsg},
+        sets::{AddSetPayload, SetsMsg},
         Msg,
     },
     state::{entities::Card, routing::Route, Model},
@@ -21,6 +23,12 @@ pub fn view(model: &Model, username: &str, deck_id: usize) -> Node<Msg> {
         return p!["loading..."];
     }
 
+    let create_card_modal_visible = use_state(|| false);
+    let card_front = use_state(|| "".to_owned());
+    let card_back = use_state(|| "".to_owned());
+    let card_link = use_state(|| "".to_owned());
+    let create_set_modal_visible = use_state(|| false);
+    let set_name = use_state(|| "".to_owned());
     let page = use_state(|| 0usize);
     let page_size = use_state(|| 10usize);
     let selected_cards = use_state(HashSet::<usize>::new);
@@ -44,7 +52,6 @@ pub fn view(model: &Model, username: &str, deck_id: usize) -> Node<Msg> {
         .collect::<Vec<usize>>();
 
     let deck_length = deck_cards.len();
-    let un = username.to_owned();
     let session_cards = selected_cards
         .get()
         .iter()
@@ -70,6 +77,99 @@ pub fn view(model: &Model, username: &str, deck_id: usize) -> Node<Msg> {
                 )
             ],
         ],
+        IF!(create_card_modal_visible.get() => dialog(
+            "Add Card",
+            form![
+                attrs! { At::Class => "spectrum-Form" },
+                text_input(
+                    "text",
+                    "Front",
+                    "Native language word",
+                    card_front.get().as_str(),
+                    move |value| card_front.set(value),
+                ),
+                text_input(
+                    "text",
+                    "Back",
+                    "Foreign language word",
+                    card_back.get().as_str(),
+                    move |value| card_back.set(value),
+                ),
+                text_input(
+                    "text",
+                    "Link",
+                    "Optional context link",
+                    card_link.get().as_str(),
+                    move |value| card_link.set(value),
+                ),
+            ],
+            vec![
+                button(
+                    "Cancel",
+                    ButtonType::Secondary,
+                    move |_| {
+                        create_card_modal_visible.set(false);
+                        Msg::Routing(RoutingMsg::ModalOpen(false))
+                    },
+                    false
+                ),
+                button(
+                    "Confirm",
+                    ButtonType::CTA,
+                    move |_| {
+                        create_card_modal_visible.set(false);
+                        Msg::Cards(CardsMsg::AddCard(AddCardPayload {
+                            deck_id,
+                            front: card_front.get(),
+                            back: card_back.get(),
+                            link: if card_link.get() == "" {
+                                None
+                            } else {
+                                Some(card_link.get())
+                            }
+                        }))
+                    },
+                    card_front.get().len() == 0 || card_back.get().len() == 0
+                )
+            ]
+        )),
+        IF!(create_set_modal_visible.get() => dialog(
+            "Create Set",
+            form![
+                attrs! { At::Class => "spectrum-Form" },
+                text_input(
+                    "text",
+                    "Name",
+                    "Enter a name for the set",
+                    set_name.get().as_str(),
+                    move |value| set_name.set(value),
+                ),
+            ],
+            vec![
+                button(
+                    "Cancel",
+                    ButtonType::Secondary,
+                    move |_| {
+                        create_set_modal_visible.set(false);
+                        Msg::Routing(RoutingMsg::ModalOpen(false))
+                    },
+                    false
+                ),
+                button(
+                    "Confirm",
+                    ButtonType::CTA,
+                    move |_| {
+                        create_set_modal_visible.set(false);
+                        Msg::Sets(SetsMsg::AddSet(AddSetPayload {
+                            deck_id,
+                            card_ids: selected_cards.get().iter().cloned().collect::<Vec<usize>>(),
+                            name: set_name.get()
+                        }))
+                    },
+                    set_name.get().len() == 0
+                )
+            ]
+        )),
         table(
             page_cards.clone(),
             vec!["Front", "Score"],
@@ -114,11 +214,10 @@ pub fn view(model: &Model, username: &str, deck_id: usize) -> Node<Msg> {
                 button(
                     "Create Set",
                     ButtonType::Action,
-                    move |_| Msg::Sets(SetsMsg::GotoAddSet(GotoAddSetPayload {
-                        username: un,
-                        deck_id,
-                        cards: selected_cards.get().iter().cloned().collect::<Vec<usize>>()
-                    })),
+                    move |_| {
+                        create_set_modal_visible.set(true);
+                        Msg::Routing(RoutingMsg::ModalOpen(true))
+                    },
                     selected_cards.get().len() == 0
                 ),
                 button(
@@ -141,10 +240,14 @@ pub fn view(model: &Model, username: &str, deck_id: usize) -> Node<Msg> {
         div![
             s().display("flex"),
             s().justify_content("flex-end"),
-            button_link(
+            button(
                 "Add Card",
                 ButtonType::CTA,
-                format!("{}", Route::AddCard(username.to_owned(), deck_id)).as_str()
+                move |_| {
+                    create_card_modal_visible.set(true);
+                    Msg::Routing(RoutingMsg::ModalOpen(true))
+                },
+                false
             ),
         ],
     ]
