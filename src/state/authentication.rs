@@ -56,3 +56,76 @@ pub fn update(action: &Msg, model: &mut AuthenticationModel) {
         _ => {}
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::messages::{authentication::*, ErrorPayload};
+
+    #[test]
+    fn login_attempt() {
+        let mut model = AuthenticationModel::new();
+        update(
+            &Msg::Authentication(AuthMsg::AttemptLogin(AttemptLoginPayload {
+                username: "foo".to_owned(),
+                password: "bar".to_owned(),
+            })),
+            &mut model,
+        );
+
+        assert_eq!(model.loading, true);
+    }
+
+    #[test]
+    fn login_failure() {
+        let mut model = AuthenticationModel {
+            loading: true,
+            username: Some("foo".to_owned()),
+            token: Some("abc123".to_owned()),
+        };
+        update(
+            &Msg::Authentication(AuthMsg::LoginFailed(ErrorPayload {
+                content: "Failed!".to_owned(),
+            })),
+            &mut model,
+        );
+
+        assert_eq!(model.loading, false);
+        assert_eq!(model.username, None);
+        assert_eq!(model.token, None);
+    }
+
+    #[test]
+    fn login_success() {
+        let mut model = AuthenticationModel {
+            loading: true,
+            username: None,
+            token: None,
+        };
+        update(
+            &Msg::Authentication(AuthMsg::LoginSuccess(LoginSuccessPayload {
+                username: "foo".to_owned(),
+                token: "abc123".to_owned(),
+            })),
+            &mut model,
+        );
+
+        assert_eq!(model.loading, false);
+        assert_eq!(model.username, Some("foo".to_owned()));
+        assert_eq!(model.token, Some("abc123".to_owned()));
+    }
+
+    #[test]
+    fn logout() {
+        let mut model = AuthenticationModel {
+            loading: false,
+            username: Some("foo".to_owned()),
+            token: Some("abc123".to_owned()),
+        };
+        update(&Msg::Authentication(AuthMsg::Logout), &mut model);
+
+        assert_eq!(model.loading, false);
+        assert_eq!(model.username, None);
+        assert_eq!(model.token, None);
+    }
+}

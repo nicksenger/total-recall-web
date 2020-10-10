@@ -1,4 +1,4 @@
-use seed::prelude::*;
+use std::time::{SystemTime, UNIX_EPOCH};
 
 use crate::messages::session::ScoreValue;
 use crate::state::entities::Card;
@@ -8,7 +8,11 @@ pub fn needs_review(card: &Card) -> bool {
 }
 
 fn days_since_seen(card: &Card) -> u128 {
-    js_sys::Date::now() as u128 - card.last_seen / 86400000
+    (SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .expect("time went backwards")
+        .as_millis()
+        - card.last_seen) / 86400000
 }
 
 fn days_until_review(card: &Card) -> u128 {

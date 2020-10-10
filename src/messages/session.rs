@@ -6,7 +6,7 @@ use super::ErrorPayload;
 use crate::operations::session;
 use crate::state::entities::Card;
 
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Clone, Deserialize, Serialize, PartialEq, Eq, Debug)]
 pub enum ScoreValue {
     Zero,
     One,

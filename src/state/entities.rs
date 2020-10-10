@@ -12,7 +12,7 @@ use crate::messages::{
     Msg,
 };
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq, Debug)]
 pub struct Set {
     pub deck: usize,
     pub id: usize,
@@ -21,7 +21,7 @@ pub struct Set {
     pub card_ids: Vec<usize>,
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq, Debug)]
 pub struct Deck {
     pub created: u128,
     pub id: usize,
@@ -30,7 +30,7 @@ pub struct Deck {
     pub owner: String,
 }
 
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Clone, Deserialize, Serialize, PartialEq, Eq, Debug)]
 pub struct Card {
     pub id: usize,
     pub created: u128,
@@ -43,7 +43,7 @@ pub struct Card {
     pub link: Option<String>,
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq, Debug)]
 pub struct Language {
     pub id: usize,
     pub abbreviation: String,
@@ -156,5 +156,210 @@ pub fn update(msg: &Msg, model: &mut EntitiesModel) {
         }
 
         _ => {}
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::messages::{cards::*, decks::*, session::*, sets::*};
+
+    fn get_test_card(id: usize) -> Card {
+        Card {
+            id,
+            audio: "http://foo.com/bar.mp3".to_owned(),
+            image: "http://foo.com/bar.jpg".to_owned(),
+            back: "hello".to_owned(),
+            front: "hola".to_owned(),
+            created: 12345,
+            last_seen: 12345,
+            link: None,
+            score: vec![],
+        }
+    }
+
+    fn get_test_deck(id: usize) -> Deck {
+        Deck {
+            id,
+            name: "foo".to_owned(),
+            owner: "waldo".to_owned(),
+            created: 12345,
+            language: "Zulu".to_owned(),
+        }
+    }
+
+    fn get_test_set(id: usize, deck_id: usize, card_ids: Vec<usize>) -> Set {
+        Set {
+            id,
+            card_ids,
+            deck: deck_id,
+            name: "foo".to_owned(),
+            owner: "waldo".to_owned(),
+        }
+    }
+
+    fn get_test_language(id: usize) -> Language {
+        Language {
+            id,
+            name: "Zulu".to_owned(),
+            abbreviation: "zl".to_owned(),
+        }
+    }
+
+    #[test]
+    fn get_cards_success() {
+        let mut model = EntitiesModel::new();
+        update(
+            &Msg::Cards(CardsMsg::GetCardsSuccess(GetCardsSuccessPayload {
+                cards: vec![get_test_card(123), get_test_card(456)],
+                deck_id: 789,
+            })),
+            &mut model,
+        );
+
+        assert_eq!(model.cards.get(&123), Some(&get_test_card(123)));
+        assert_eq!(model.cards.get(&456), Some(&get_test_card(456)));
+        assert_eq!(model.deck_cards.get(&789), Some(&vec![123, 456]));
+    }
+
+    #[test]
+    fn get_decks_success() {
+        let mut model = EntitiesModel::new();
+        update(
+            &Msg::Decks(DecksMsg::GetDecksSuccess(GetDecksSuccessPayload {
+                decks: vec![get_test_deck(123), get_test_deck(456)],
+            })),
+            &mut model,
+        );
+
+        assert_eq!(model.decks.get(&123), Some(&get_test_deck(123)));
+        assert_eq!(model.decks.get(&456), Some(&get_test_deck(456)));
+    }
+
+    #[test]
+    fn get_sets_success() {
+        let mut model = EntitiesModel::new();
+        model.cards.insert(123, get_test_card(123));
+        model.cards.insert(456, get_test_card(456));
+        update(
+            &Msg::Sets(SetsMsg::GetSetsSuccess(GetSetsSuccessPayload {
+                deck_id: 789,
+                sets: vec![
+                    get_test_set(1, 789, vec![123, 456]),
+                    get_test_set(2, 789, vec![123, 456]),
+                ],
+            })),
+            &mut model,
+        );
+
+        assert_eq!(
+            model.sets.get(&1),
+            Some(&get_test_set(1, 789, vec![123, 456]))
+        );
+        assert_eq!(
+            model.sets.get(&2),
+            Some(&get_test_set(2, 789, vec![123, 456]))
+        );
+        assert_eq!(model.set_cards.get(&1), Some(&vec![123, 456]));
+        assert_eq!(model.set_cards.get(&2), Some(&vec![123, 456]));
+        assert_eq!(model.deck_sets.get(&789), Some(&vec![1, 2]));
+    }
+
+    #[test]
+    fn delete_deck_success() {
+        let mut model = EntitiesModel::new();
+        model.decks.insert(789, get_test_deck(789));
+        update(
+            &Msg::Decks(DecksMsg::DeleteDeckSuccess(DeleteDeckSuccessPayload {
+                deck_id: 789,
+            })),
+            &mut model,
+        );
+
+        assert_eq!(model.decks.get(&789), None);
+    }
+
+    #[test]
+    fn delete_card_success() {
+        let mut model = EntitiesModel::new();
+        model.cards.insert(123, get_test_card(123));
+        model.deck_cards.insert(789, vec![123]);
+        model.set_cards.insert(1, vec![123]);
+        update(
+            &Msg::Cards(CardsMsg::DeleteCardSuccess(DeleteCardSuccessPayload {
+                card_id: 123,
+            })),
+            &mut model,
+        );
+
+        assert_eq!(model.cards.get(&123), None);
+        assert_eq!(model.deck_cards.get(&789), Some(&vec![]));
+        assert_eq!(model.set_cards.get(&1), Some(&vec![]));
+    }
+
+    #[test]
+    fn delete_set_success() {
+        let mut model = EntitiesModel::new();
+        model.sets.insert(1, get_test_set(1, 789, vec![123, 456]));
+        model.deck_sets.insert(789, vec![1]);
+        update(
+            &Msg::Sets(SetsMsg::DeleteSetSuccess(DeleteSetSuccessPayload {
+                set_id: 1,
+            })),
+            &mut model,
+        );
+
+        assert_eq!(model.sets.get(&1), None);
+        assert_eq!(model.deck_sets.get(&789), Some(&vec![]));
+    }
+
+    #[test]
+    fn edit_card_link_success() {
+        let mut model = EntitiesModel::new();
+        model.cards.insert(123, get_test_card(123));
+        update(
+            &Msg::Cards(CardsMsg::EditCardLinkSuccess(EditCardLinkSuccessPayload {
+                card_id: 123,
+                link: "foo.com/bar".to_owned(),
+            })),
+            &mut model,
+        );
+
+        assert_eq!(
+            model.cards.get(&123).map(|c| c.link.clone()).unwrap(),
+            Some("foo.com/bar".to_owned())
+        );
+    }
+
+    #[test]
+    fn rate_card_success() {
+        let mut model = EntitiesModel::new();
+        model.cards.insert(123, get_test_card(123));
+        update(
+            &Msg::Session(SessionMsg::RateCardSuccess(RateCardSuccessPayload {
+                card_id: 123,
+                rating: ScoreValue::Two,
+            })),
+            &mut model,
+        );
+
+        assert_eq!(
+            model.cards.get(&123).map(|c| c.score.last().unwrap()),
+            Some(&ScoreValue::Two)
+        );
+    }
+
+    #[test]
+    fn get_languages_success() {
+        let mut model = EntitiesModel::new();
+        update(
+            &Msg::Decks(DecksMsg::GetLanguagesSuccess(GetLanguagesSuccessPayload {
+                languages: vec![get_test_language(8), get_test_language(12)],
+            })),
+            &mut model,
+        );
+
+        assert_eq!(model.languages.get(&8), Some(&get_test_language(8)));
+        assert_eq!(model.languages.get(&12), Some(&get_test_language(12)));
     }
 }

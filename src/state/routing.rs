@@ -4,7 +4,7 @@ use seed::prelude::*;
 
 use crate::messages::{routing::RoutingMsg, Msg};
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Route {
     Home,
     Login,
@@ -220,5 +220,43 @@ pub fn update(action: &Msg, model: &mut RoutingModel) {
         }
 
         _ => {}
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::messages::routing::*;
+
+    #[test]
+    fn initialization() {
+        let a = RoutingModel::new(seed::Url::new());
+        assert_eq!(a.route, Route::Home);
+
+        let non_matching_url = seed::Url::new().set_path(&["some", "random", "path"]);
+        let b = RoutingModel::new(non_matching_url);
+        assert_eq!(b.route, Route::NotFound);
+    }
+
+    #[test]
+    fn navigate() {
+        let mut model = RoutingModel::new(seed::Url::new());
+
+        update(
+            &Msg::Routing(RoutingMsg::Navigate(Route::Manual)),
+            &mut model,
+        );
+        assert_eq!(model.route, Route::Manual);
+    }
+
+    #[test]
+    fn modal() {
+        let mut model = RoutingModel::new(seed::Url::new());
+
+        update(&Msg::Routing(RoutingMsg::ModalOpen(true)), &mut model);
+        assert_eq!(model.modal_open, true);
+
+        update(&Msg::Routing(RoutingMsg::ModalOpen(false)), &mut model);
+        assert_eq!(model.modal_open, false);
     }
 }
